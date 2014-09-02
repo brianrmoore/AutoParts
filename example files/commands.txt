@@ -1,0 +1,4 @@
+./AutoParts -i conifer.in -o conifer_1_K3.0 -l 2000000 -p 1000 -s 1000 -d 1000000 -c 1 -k 3.0 >conifer_1_K3.0.log
+./AutoParts -i conifer.in -o conifer_2_K3.0 -l 2000000 -p 1000 -s 1000 -d 1000000 -c 1 -k 3.0 >conifer_2_K3.0.log
+./AutoParts -i conifer.in -o conifer_3_K3.0 -l 2000000 -p 1000 -s 1000 -d 1000000 -c 1 -k 3.0 >conifer_3_K3.0.log
+./AutoParts -i conifer.in -o conifer_4_K3.0 -l 2000000 -p 1000 -s 1000 -d 1000000 -c 1 -k 3.0 >conifer_4_K3.0.log
