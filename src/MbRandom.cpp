@@ -609,7 +609,7 @@ double MbRandom::betaQuantile(double a, double b, double p) {
  */
 void MbRandom::dirichletRv(const std::vector<double> &a, std::vector<double> &z) {
 
-	int n = a.size();
+	int n = (int)a.size();
 	double sum = 0.0;
 	for(int i=0; i<n; i++)
 		{
@@ -634,7 +634,7 @@ void MbRandom::dirichletRv(const std::vector<double> &a, std::vector<double> &z)
  */
 double MbRandom::dirichletPdf(const std::vector<double> &a, const std::vector<double> &z) {
 	
-	int n = a.size();
+	int n = (int)a.size();
 	double zSum = 0.0;
 	for (int i=0; i<n; i++)
 		zSum += z[i];
@@ -677,7 +677,7 @@ double MbRandom::dirichletPdf(const std::vector<double> &a, const std::vector<do
  */
 double MbRandom::lnDirichletPdf(const std::vector<double> &a, const std::vector<double> &z) {
 
-	int n = a.size(); //!< we assume that a and z have the same size
+	int n = (int)a.size(); //!< we assume that a and z have the same size
 	double alpha0 = 0.0;
 	for (int i=0; i<n; i++)
 		alpha0 += a[i];
@@ -1502,7 +1502,7 @@ double MbRandom::rndGamma(double s) {
 	else if (s > 1.0)  
 		r = rndGamma2(s);
 	else           
-		r =- log(uniformRv());
+		r = -log(uniformRv());
 	return (r);
 }
 

@@ -27,7 +27,7 @@ class Model {
 					Tree*   findTree(int part);
 			  TreeLength*   findTreeLength(int part);
                    Chunk*   getChunk(int i) { return chunks[i]; }
-			          int   getNumRestaurants(void) { return restaurants.size(); }
+			          int   getNumRestaurants(void) { return (int)restaurants.size(); }
 			  Restaurant*   getRestaurant(int i) { return restaurants[i]; }
 					  int   getRestaurantId(Restaurant* rest);
 			  Restaurant*   getRestaurantToChange(void);

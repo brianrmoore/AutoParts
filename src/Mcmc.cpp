@@ -75,7 +75,7 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp) {
 		{
 		std::string restaurantName = modelPtr->getRestaurant(i)->getName();
 		if (restaurantName.size() > longestName)
-			longestName = restaurantName.size();
+			longestName = (int)restaurantName.size();
 		}
 	std::cout << std::endl;
 	std::cout << "Parm";

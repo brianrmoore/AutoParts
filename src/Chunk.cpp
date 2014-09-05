@@ -34,7 +34,7 @@ Chunk::Chunk(Alignment* ap, Settings* sp, Model* mp, int si) {
 		if ( alignmentPtr->getIsExcluded(i) == false && alignmentPtr->getPartitionId(i) == subsetId + 1 )
 			includedSites.insert(i);
 		}
-	numSites = includedSites.size();
+	numSites = (int)includedSites.size();
 	
 	// allocate the space for the conditional likelihoods for the chunk
 	int condLikeSize = numNodes * numSites * 4 * numGammaCats;
