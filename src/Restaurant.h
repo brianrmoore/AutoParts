@@ -20,7 +20,7 @@ class Restaurant {
 					 bool   change(void);
 					 bool   changeParmOnTable(Table* tbl);
 			  std::string   getName(void) { return name; }
-					  int   getNumTables(void) { return tables.size(); }
+					  int   getNumTables(void) { return (int)tables.size(); }
 				   ParmId   getParmId(void) { return parmId; }
 				   Table*   getTableWithPatron(int patron);
 					 void   print(void);

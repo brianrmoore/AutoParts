@@ -99,7 +99,7 @@ MbTransitionMatrix::MbTransitionMatrix(const std::vector<double> &rate, const st
 	oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen), hasUniformizedMatrix(false) {
 
 	// Check for consistency
-	int nSt = pi.size();
+	int nSt = (int)pi.size();
 	if ( 2*rate.size() != nSt*(nSt-1) )
 		return;	// return empty transition matrix
 

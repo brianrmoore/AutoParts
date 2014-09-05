@@ -22,7 +22,7 @@ class Table {
 			  std::string   getParmString(int n);
 		   std::set<int>&   getPatrons(void) { return patrons; }
 					 bool   isPatronAtTable(int i);
-					  int   numPatronsAtTable(void) { return patrons.size(); }
+					  int   numPatronsAtTable(void) { return (int)patrons.size(); }
 					 void   print(void);
 					 void   removePatron(int i);
 					 void   seatPatron(int i);

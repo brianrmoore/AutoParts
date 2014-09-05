@@ -114,7 +114,7 @@ int StateSets::calcStateSetFor(int s1, int n1, int s2, int n2, int s3, int n3) {
 	int numChanges = 0;
 	for (int c=0; c<numChar; c++)
 		{
-		if ( (*ss2) & (*ss3) == 0 )
+		if ( ((*ss2) & (*ss3)) == 0 )
 			{
 			(*ss1) = (*ss2) | (*ss3);
 			numChanges++;

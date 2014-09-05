@@ -187,7 +187,7 @@ void SubRates::clone(SubRates &s) {
 
 double SubRates::normalizeRates(std::vector<double> &a, double minVal, double total) {
 
-	int n = a.size();
+	int n = (int)a.size();
 	double normalizeTo = total;
 	double sum = 0.0;
 	for (int i=0; i<n; i++)
