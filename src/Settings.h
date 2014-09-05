@@ -12,6 +12,7 @@ class Settings {
 				   double   getBrlenLambda(void) { return brlenLambda; }
 				      int   getChainLength(void) { return chainLength; }
 			  std::string   getDataFilePathName(void) { return dataFilePathName; }
+			  std::string   getLogFileName(void) { return logFileName; }
 				      int   getPrintFrequency(void) { return printFrequency; }
 				      int   getNumGammaCats(void) { return numGammaCats; }
 			  std::string   getOutPutFileName(void) { return outPutFileName; }
@@ -37,6 +38,7 @@ class Settings {
 				      int   numGammaCats;
 			  std::string   outPutFileName;
 			  std::string   treeFileName;
+              std::string   logFileName;
 					  int   printFrequency;
 					  int   sampleFrequency;
 				   double   asrvLambda;

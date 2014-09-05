@@ -7,46 +7,47 @@
 
 Settings::Settings(int argc, char *argv[]) {
 
-#	if 0
+#	if 1
 	/* set up fake command-line argument string */
-	char *cmdString[25];
+	char *cmdString[28];
 	cmdString[ 0] = (char*)"ck";
 	cmdString[ 1] = (char*)"-i";
-	cmdString[ 2] = (char*)"/Users/johnh/Desktop/autopartssim2/simdata1_auto.in";
+	cmdString[ 2] = (char*)"/Users/johnh/AutoParts/example files/conifer.in";
 	cmdString[ 3] = (char*)"-o";
-	cmdString[ 4] = (char*)"/Users/johnh/Desktop/autopartssim2/simdata1_auto";
-	cmdString[ 5] = (char*)"-l";
-	cmdString[ 6] = (char*)"100000";
-	cmdString[ 7] = (char*)"-p";
-	cmdString[ 8] = (char*)"1";
-	cmdString[ 9] = (char*)"-s";
-	cmdString[10] = (char*)"100";
-	cmdString[11] = (char*)"-b";
-	cmdString[12] = (char*)"20.0";
-	cmdString[13] = (char*)"-g";
-	cmdString[14] = (char*)"4";
-	cmdString[15] = (char*)"-e";
-	cmdString[16] = (char*)"2.0";
-	cmdString[17] = (char*)"-c";
-	cmdString[18] = (char*)"1";
-	cmdString[19] = (char*)"-m";
-	cmdString[20] = (char*)"1.1";
-	cmdString[21] = (char*)"-v";
-	cmdString[22] = (char*)"2.0";
-	cmdString[23] = (char*)"-k";
+	cmdString[ 4] = (char*)"/Users/johnh/AutoParts/conifer.out";
+	cmdString[ 5] = (char*)"-f";
+	cmdString[ 6] = (char*)"/Users/johnh/AutoParts/conifer.log";
+	cmdString[ 7] = (char*)"-l";
+	cmdString[ 8] = (char*)"100000";
+	cmdString[ 9] = (char*)"-p";
+	cmdString[10] = (char*)"1";
+	cmdString[11] = (char*)"-s";
+	cmdString[12] = (char*)"100";
+	cmdString[13] = (char*)"-b";
+	cmdString[14] = (char*)"20.0";
+	cmdString[15] = (char*)"-g";
+	cmdString[16] = (char*)"4";
+	cmdString[17] = (char*)"-e";
+	cmdString[18] = (char*)"2.0";
+	cmdString[19] = (char*)"-c";
+	cmdString[20] = (char*)"1";
+	cmdString[21] = (char*)"-m";
+	cmdString[22] = (char*)"1.1";
+	cmdString[23] = (char*)"-v";
 	cmdString[24] = (char*)"2.0";
-	//cmdString[23] = "-t";
-	//cmdString[24] = "/Users/johnh/Working/chungking/.tree";
-	argc = 25;
+	cmdString[25] = (char*)"-k";
+	cmdString[26] = (char*)"2.0";
+	argc = 27;
 	argv = cmdString;
 #	endif
 
-	enum Mode { DATA_FILE, TREE_FILE, OUTPUT_FILE, CHAIN_LENGTH, PRINT_FREQ, SAMPLE_FREQ, BRLEN_PARM, NUM_GAMMA_CATS, ASRV_LAMBDA, CONC_FIXED, EXP_CATS, CONC_MEAN, CONC_VAR, TUNE_T1, TUNE_T2, TUNE_T3, TUNE_T4, TUNE_T5, NONE };
+	enum Mode { DATA_FILE, TREE_FILE, OUTPUT_FILE, LOG_FILE, CHAIN_LENGTH, PRINT_FREQ, SAMPLE_FREQ, BRLEN_PARM, NUM_GAMMA_CATS, ASRV_LAMBDA, CONC_FIXED, EXP_CATS, CONC_MEAN, CONC_VAR, TUNE_T1, TUNE_T2, TUNE_T3, TUNE_T4, TUNE_T5, NONE };
 
 	/* set default values for parameters */
 	dataFilePathName       = "";
 	treeFileName           = "";
 	outPutFileName         = "";
+    logFileName            = "";
 	chainLength            = 1000000;
 	printFrequency         = 100;
 	sampleFrequency        = 100;
@@ -85,6 +86,8 @@ Settings::Settings(int argc, char *argv[]) {
 					status = TREE_FILE;
 				else if ( cmd == "-o" )
 					status = OUTPUT_FILE;
+				else if ( cmd == "-f" )
+					status = LOG_FILE;
 				else if ( cmd == "-l" )
 					status = CHAIN_LENGTH;
 				else if ( cmd == "-p" )
@@ -130,6 +133,8 @@ Settings::Settings(int argc, char *argv[]) {
 					outPutFileName = argv[i];
 				else if ( status == TREE_FILE )
 					treeFileName = argv[i];
+				else if ( status == LOG_FILE )
+					logFileName = argv[i];
 				else if ( status == CHAIN_LENGTH )
 					chainLength = atoi(argv[i]);
 				else if ( status == PRINT_FREQ )
@@ -202,6 +207,7 @@ void Settings::printUsage(void) {
 	std::cout << "   -i : Input file name" << std::endl;
 	std::cout << "   -t : Tree file name (for constraining the analysis to a fixed tree)" << std::endl;
 	std::cout << "   -o : Output file name" << std::endl;
+	std::cout << "   -f : File name for logging of screen output" << std::endl;
 	std::cout << "   -l : Number of MCMC cycles" << std::endl;
 	std::cout << "   -p : Print frequency" << std::endl;
 	std::cout << "   -s : Sample frequency" << std::endl;
