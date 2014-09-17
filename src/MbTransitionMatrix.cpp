@@ -48,8 +48,8 @@
  */
 MbTransitionMatrix::MbTransitionMatrix(const std::vector<double> &rate, bool useEigen)
     : c_ijk(0), cc_ijk(0), ceigenvalue(0), ceigValExp(0), eigens(0), eigenvalue(0), eigValExp(0), 
-	isComplex(false), isOldComplex(false), isRev(false), numStates(0), oldC_ijk(0), oldEigenvalue(0), 
-	oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen), hasUniformizedMatrix(false) {
+	hasUniformizedMatrix(false), isComplex(false), isOldComplex(false), isRev(false), numStates(0),
+	oldC_ijk(0), oldEigenvalue(0), oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen) {
 
 	// Find number of rates
 	int nSt = (int) (floor(sqrt((double)rate.size()))) + 1;
@@ -95,8 +95,8 @@ MbTransitionMatrix::MbTransitionMatrix(const std::vector<double> &rate, bool use
  */
 MbTransitionMatrix::MbTransitionMatrix(const std::vector<double> &rate, const std::vector<double> &pi, bool useEigen)
     : c_ijk(0), cc_ijk(0), ceigenvalue(0), ceigValExp(0), eigens(0), eigenvalue(0), eigValExp(0), 
-	isComplex(false), isOldComplex(false), isRev(true), numStates(0), oldC_ijk(0), oldEigenvalue(0), 
-	oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen), hasUniformizedMatrix(false) {
+	hasUniformizedMatrix(false), isComplex(false), isOldComplex(false), isRev(true), numStates(0),
+	oldC_ijk(0), oldEigenvalue(0), oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen) {
 
 	// Check for consistency
 	int nSt = (int)pi.size();
@@ -139,8 +139,8 @@ MbTransitionMatrix::MbTransitionMatrix(const std::vector<double> &rate, const st
  */
 MbTransitionMatrix::MbTransitionMatrix(const MbMatrix<double> &qMat, bool useEigen)
     : c_ijk(0), cc_ijk(0), ceigenvalue(0), ceigValExp(0), eigens(0), eigenvalue(0), eigValExp(0), 
-	isComplex(false), isOldComplex(false), isRev(true), numStates(0), oldC_ijk(0), oldEigenvalue(0), 
-	oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen), hasUniformizedMatrix(false) {
+	hasUniformizedMatrix(false), isComplex(false), isOldComplex(false), isRev(true), numStates(0),
+    oldC_ijk(0), oldEigenvalue(0), oldCC_ijk(0), oldCEigenvalue(0), useEigens(useEigen) {
 
 	// Initialize
 	numStates = qMat.dim1();

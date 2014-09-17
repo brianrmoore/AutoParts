@@ -408,10 +408,10 @@ int MbEigensystem::complexLUDecompose(MbMatrix<mbcompl> &a, double *vv, int *ind
 			}
 		indx[j] = imax;
 		if ( a[j][j].real() == 0.0 && a[j][j].imag() == 0.0 )
-			a[j][j] = (1.0e-20, 1.0e-20);
+			a[j][j] = mbcompl(1.0e-20, 1.0e-20);
 		if ( j != n - 1 )
 			{
-			std::complex<double> x = (1.0, 0.0);
+			std::complex<double> x = mbcompl(1.0, 0.0);
 			std::complex<double> cdum = x / a[j][j];
 			for (int i=j+1; i<n; i++)
 				a[i][j] = a[i][j] * cdum;
@@ -577,7 +577,7 @@ int MbEigensystem::hqr2(int low, int high, MbMatrix<double> &h, std::vector<doub
 
 	/* search for next eigenvalues */
 	int en=high, na, numIterations = n * 30;
-	double p, q, r, s, t=0.0, w, x, y, z;
+	double p = 0.0, q = 0.0, r = 0.0, s = 0.0, t=0.0, w = 0.0, x, y = 0.0, z = 0.0;
 	while ( en >= low )
 		{
 		int iter = 0;
@@ -916,8 +916,8 @@ int MbEigensystem::hqr2(int low, int high, MbMatrix<double> &h, std::vector<doub
 							else
 								{
 								//complexDivision(-r - y * h[i][na], -s - y * h[i][en], z, q, &h[i+1][na], &h[i+1][en]);
-								ca = ( -r - y * h[i][na], -s - y * h[i][en] );
-								cb = (                 z,                 q );
+								ca = mbcompl( -r - y * h[i][na], -s - y * h[i][en] );
+								cb = mbcompl(                 z,                 q );
 								cc = ca / cb;
 								h[i+1][na] = cc.real();
 								h[i+1][en] = cc.imag();
@@ -1060,18 +1060,18 @@ void MbEigensystem::initializeComplexEigenvectors(void) {
 		// real eigenvector
 		if (imaginaryEigenvalues[i] == 0.0) { 
 			for(int j=0; j<n; j++)
-				complexEigenvectors[j][i] = (eigenvectors[j][i], 0.0);
+				complexEigenvectors[j][i] = mbcompl(eigenvectors[j][i], 0.0);
 		}
 		// complex eigenvector with positive imaginary part
 		else if (imaginaryEigenvalues[i] > 0.0) { 
 			for (int j=0; j<n; j++)
-				complexEigenvectors[j][i] = (eigenvectors[j][i], eigenvectors[j][i+1]);
+				complexEigenvectors[j][i] = mbcompl(eigenvectors[j][i], eigenvectors[j][i+1]);
 		}
 		// complex eigenvector with negative imaginary part
 		// retrieve this as the conjugate of the preceding eigenvector
 		else if (imaginaryEigenvalues[i] < 0.0) { 
 			for (int j=0; j<n; j++)
-				complexEigenvectors[j][i] = (eigenvectors[j][i-1], -eigenvectors[j][i]);
+				complexEigenvectors[j][i] = mbcompl(eigenvectors[j][i-1], -eigenvectors[j][i]);
 		}
 	}
 }
@@ -1103,8 +1103,8 @@ int MbEigensystem::invertComplexMatrix(MbMatrix<mbcompl> &a, MbMatrix<mbcompl> &
 		for (int j=0; j<n; j++) 
 			{
 			for (int i=0; i<n; i++)
-				col[i] = (0.0, 0.0);
-			col[j] = (1.0, 0.0);
+				col[i] = mbcompl(0.0, 0.0);
+			col[j] = mbcompl(1.0, 0.0);
 			complexLUBackSubstitution(tempA, indx, col);
 			for (int i=0; i<n; i++)
 				aInv[i][j] = col[i];
