@@ -14,6 +14,11 @@
 #include "Settings.h"
 
 
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
+
+
 
 Chunk::Chunk(Alignment* ap, Settings* sp, Model* mp, int si) {
 
@@ -113,13 +118,14 @@ double Chunk::lnLikelihood(bool storeScore) {
 	for (int i=0; i<numSites; i++)
 		lnScaler[i] = 0.0;
 		
+    
 	for (int n=0; n<treePtr->getNumNodes(); n++)
-		{
+    {
 		Node* p = treePtr->getDownPassNode( n );
 		if ( p->getIsLeaf() == false )
-			{
+        {
 			if (p->getAnc()->getAnc() == NULL)
-				{
+            {
 				/* three-way split */
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
@@ -130,29 +136,144 @@ double Chunk::lnLikelihood(bool storeScore) {
 				double *clA = getClsForNode(ancIdx);
 				double *clP = getClsForNode(idx   );
 				for (int c=0; c<numSites; c++)
-					{
+                {
 					for (int k=0; k<numGammaCats; k++)
-						{
-						for (int i=0; i<4; i++)
-							{
-							double sumL = 0.0, sumR = 0.0, sumA = 0.0;
-							for (int j=0; j<4; j++)
-								{
-								sumL += clL[j] * tis[lftIdx][k][i][j];
-								sumR += clR[j] * tis[rhtIdx][k][i][j];
-								sumA += clA[j] * tis[idx   ][k][i][j];
-								}
-							clP[i] = sumL * sumR * sumA;
-							}
-						clP += 4;
-						clL += 4;
-						clR += 4;
-						clA += 4;
-						}
-					}
-				}
+                    {
+                            
+                        __m128d clL_01 = _mm_load_pd(clL);
+                        __m128d clL_23 = _mm_load_pd(clL+2);
+                            
+                        __m128d clR_01 = _mm_load_pd(clR);
+                        __m128d clR_23 = _mm_load_pd(clR+2);
+                            
+                        __m128d clA_01 = _mm_load_pd(clA);
+                        __m128d clA_23 = _mm_load_pd(clA+2);
+                        
+                        /* A */
+                        
+                        __m128d a_tis_l_01 = _mm_load_pd(tis[lftIdx][k][0]);
+                        __m128d a_tis_l_23 = _mm_load_pd(tis[lftIdx][k][0]+2);
+                            
+                        __m128d a_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][0]);
+                        __m128d a_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][0]+2);
+                            
+                        __m128d a_tis_a_01 = _mm_load_pd(tis[   idx][k][0]);
+                        __m128d a_tis_a_23 = _mm_load_pd(tis[   idx][k][0]+2);
+                            
+                        __m128d a_l_p01 = _mm_mul_pd(clL_01,a_tis_l_01);
+                        __m128d a_l_p23 = _mm_mul_pd(clL_23,a_tis_l_23);
+                            
+                        __m128d a_r_p01 = _mm_mul_pd(clR_01,a_tis_r_01);
+                        __m128d a_r_p23 = _mm_mul_pd(clR_23,a_tis_r_23);
+                            
+                        __m128d a_a_p01 = _mm_mul_pd(clA_01,a_tis_a_01);
+                        __m128d a_a_p23 = _mm_mul_pd(clA_23,a_tis_a_23);
+                            
+                        __m128d a_sum_L = _mm_hadd_pd(a_l_p01,a_l_p23);
+                        __m128d a_sum_R = _mm_hadd_pd(a_r_p01,a_r_p23);
+                        __m128d a_sum_A = _mm_hadd_pd(a_a_p01,a_a_p23);
+                            
+                        /* C */
+                            
+                        __m128d c_tis_l_01 = _mm_load_pd(tis[lftIdx][k][1]);
+                        __m128d c_tis_l_23 = _mm_load_pd(tis[lftIdx][k][1]+2);
+                            
+                        __m128d c_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][1]);
+                        __m128d c_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][1]+2);
+                            
+                        __m128d c_tis_a_01 = _mm_load_pd(tis[   idx][k][1]);
+                        __m128d c_tis_a_23 = _mm_load_pd(tis[   idx][k][1]+2);
+                            
+                        __m128d c_l_p01 = _mm_mul_pd(clL_01,c_tis_l_01);
+                        __m128d c_l_p23 = _mm_mul_pd(clL_23,c_tis_l_23);
+                            
+                        __m128d c_r_p01 = _mm_mul_pd(clR_01,c_tis_r_01);
+                        __m128d c_r_p23 = _mm_mul_pd(clR_23,c_tis_r_23);
+                            
+                        __m128d c_a_p01 = _mm_mul_pd(clA_01,c_tis_a_01);
+                        __m128d c_a_p23 = _mm_mul_pd(clA_23,c_tis_a_23);
+                            
+                        __m128d c_sum_L = _mm_hadd_pd(c_l_p01,c_l_p23);
+                        __m128d c_sum_R = _mm_hadd_pd(c_r_p01,c_r_p23);
+                        __m128d c_sum_A = _mm_hadd_pd(c_a_p01,c_a_p23);
+                            
+                        /* G */
+                            
+                        __m128d g_tis_l_01 = _mm_load_pd(tis[lftIdx][k][2]);
+                        __m128d g_tis_l_23 = _mm_load_pd(tis[lftIdx][k][2]+2);
+                        
+                        __m128d g_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][2]);
+                        __m128d g_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][2]+2);
+                            
+                        __m128d g_tis_a_01 = _mm_load_pd(tis[   idx][k][2]);
+                        __m128d g_tis_a_23 = _mm_load_pd(tis[   idx][k][2]+2);
+                            
+                        __m128d g_l_p01 = _mm_mul_pd(clL_01,g_tis_l_01);
+                        __m128d g_l_p23 = _mm_mul_pd(clL_23,g_tis_l_23);
+                            
+                        __m128d g_r_p01 = _mm_mul_pd(clR_01,g_tis_r_01);
+                        __m128d g_r_p23 = _mm_mul_pd(clR_23,g_tis_r_23);
+                            
+                        __m128d g_a_p01 = _mm_mul_pd(clA_01,g_tis_a_01);
+                        __m128d g_a_p23 = _mm_mul_pd(clA_23,g_tis_a_23);
+                            
+                        __m128d g_sum_L = _mm_hadd_pd(g_l_p01,g_l_p23);
+                        __m128d g_sum_R = _mm_hadd_pd(g_r_p01,g_r_p23);
+                        __m128d g_sum_A = _mm_hadd_pd(g_a_p01,g_a_p23);
+                            
+                        /* T */
+                            
+                        __m128d t_tis_l_01 = _mm_load_pd(tis[lftIdx][k][3]);
+                        __m128d t_tis_l_23 = _mm_load_pd(tis[lftIdx][k][3]+2);
+                            
+                        __m128d t_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][3]);
+                        __m128d t_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][3]+2);
+                            
+                        __m128d t_tis_a_01 = _mm_load_pd(tis[   idx][k][3]);
+                        __m128d t_tis_a_23 = _mm_load_pd(tis[   idx][k][3]+2);
+                            
+                        __m128d t_l_p01 = _mm_mul_pd(clL_01,t_tis_l_01);
+                        __m128d t_l_p23 = _mm_mul_pd(clL_23,t_tis_l_23);
+                            
+                        __m128d t_r_p01 = _mm_mul_pd(clR_01,t_tis_r_01);
+                        __m128d t_r_p23 = _mm_mul_pd(clR_23,t_tis_r_23);
+                            
+                        __m128d t_a_p01 = _mm_mul_pd(clA_01,t_tis_a_01);
+                        __m128d t_a_p23 = _mm_mul_pd(clA_23,t_tis_a_23);
+                            
+                        __m128d t_sum_L = _mm_hadd_pd(t_l_p01,t_l_p23);
+                        __m128d t_sum_R = _mm_hadd_pd(t_r_p01,t_r_p23);
+                        __m128d t_sum_A = _mm_hadd_pd(t_a_p01,t_a_p23);
+                            
+                            
+                        // now put it all together
+
+                        __m128d ac_sum_L = _mm_hadd_pd(a_sum_L,c_sum_L);
+                        __m128d ac_sum_R = _mm_hadd_pd(a_sum_R,c_sum_R);
+                        __m128d ac_sum_A = _mm_hadd_pd(a_sum_A,c_sum_A);
+                        __m128d gt_sum_L = _mm_hadd_pd(g_sum_L,t_sum_L);
+                        __m128d gt_sum_R = _mm_hadd_pd(g_sum_R,t_sum_R);
+                        __m128d gt_sum_A = _mm_hadd_pd(g_sum_A,t_sum_A);
+                            
+                            
+                        __m128d ac_prod_LR = _mm_mul_pd(ac_sum_L,ac_sum_R);
+                        __m128d gt_prod_LR = _mm_mul_pd(gt_sum_L,gt_sum_R);
+                            
+                        __m128d ac = _mm_mul_pd(ac_prod_LR,ac_sum_A);
+                        __m128d gt = _mm_mul_pd(gt_prod_LR,gt_sum_A);
+
+                        _mm_store_pd(clP,ac);
+                        _mm_store_pd(clP+2,gt);
+                            
+                        clP += 4;
+                        clL += 4;
+                        clR += 4;
+                        clA += 4;
+                    }
+                }
+            }
 			else
-				{
+            {
 				/* two-way split */
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
@@ -161,25 +282,107 @@ double Chunk::lnLikelihood(bool storeScore) {
 				double *clR = getClsForNode(rhtIdx);
 				double *clP = getClsForNode(idx   );
 				for (int c=0; c<numSites; c++)
-					{
+                {
 					for (int k=0; k<numGammaCats; k++)
-						{
-						for (int i=0; i<4; i++)
-							{
-							double sumL = 0.0, sumR = 0.0;
-							for (int j=0; j<4; j++)
-								{
-								sumL += clL[j] * tis[lftIdx][k][i][j];
-								sumR += clR[j] * tis[rhtIdx][k][i][j];
-								}
-							clP[i] = sumL * sumR;
-							}
-						clP += 4;
-						clL += 4;
-						clR += 4;
-						}
-					}
-				}
+                    {
+                            
+                        __m128d clL_01 = _mm_load_pd(clL);
+                        __m128d clL_23 = _mm_load_pd(clL+2);
+                        
+                        __m128d clR_01 = _mm_load_pd(clR);
+                        __m128d clR_23 = _mm_load_pd(clR+2);
+                        
+                        /* A */
+                            
+                        __m128d a_tis_l_01 = _mm_load_pd(tis[lftIdx][k][0]);
+                        __m128d a_tis_l_23 = _mm_load_pd(tis[lftIdx][k][0]+2);
+                            
+                        __m128d a_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][0]);
+                        __m128d a_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][0]+2);
+                            
+                        __m128d a_l_p01 = _mm_mul_pd(clL_01,a_tis_l_01);
+                        __m128d a_l_p23 = _mm_mul_pd(clL_23,a_tis_l_23);
+                            
+                        __m128d a_r_p01 = _mm_mul_pd(clR_01,a_tis_r_01);
+                        __m128d a_r_p23 = _mm_mul_pd(clR_23,a_tis_r_23);
+                            
+                        __m128d a_sum_L = _mm_hadd_pd(a_l_p01,a_l_p23);
+                        __m128d a_sum_R = _mm_hadd_pd(a_r_p01,a_r_p23);
+                            
+                        /* C */
+                            
+                        __m128d c_tis_l_01 = _mm_load_pd(tis[lftIdx][k][1]);
+                        __m128d c_tis_l_23 = _mm_load_pd(tis[lftIdx][k][1]+2);
+                            
+                        __m128d c_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][1]);
+                        __m128d c_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][1]+2);
+                            
+                        __m128d c_l_p01 = _mm_mul_pd(clL_01,c_tis_l_01);
+                        __m128d c_l_p23 = _mm_mul_pd(clL_23,c_tis_l_23);
+                            
+                        __m128d c_r_p01 = _mm_mul_pd(clR_01,c_tis_r_01);
+                        __m128d c_r_p23 = _mm_mul_pd(clR_23,c_tis_r_23);
+                            
+                        __m128d c_sum_L = _mm_hadd_pd(c_l_p01,c_l_p23);
+                        __m128d c_sum_R = _mm_hadd_pd(c_r_p01,c_r_p23);
+                            
+                        /* G */
+                            
+                        __m128d g_tis_l_01 = _mm_load_pd(tis[lftIdx][k][2]);
+                        __m128d g_tis_l_23 = _mm_load_pd(tis[lftIdx][k][2]+2);
+                            
+                        __m128d g_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][2]);
+                        __m128d g_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][2]+2);
+                            
+                        __m128d g_l_p01 = _mm_mul_pd(clL_01,g_tis_l_01);
+                        __m128d g_l_p23 = _mm_mul_pd(clL_23,g_tis_l_23);
+                            
+                        __m128d g_r_p01 = _mm_mul_pd(clR_01,g_tis_r_01);
+                        __m128d g_r_p23 = _mm_mul_pd(clR_23,g_tis_r_23);
+                            
+                        __m128d g_sum_L = _mm_hadd_pd(g_l_p01,g_l_p23);
+                        __m128d g_sum_R = _mm_hadd_pd(g_r_p01,g_r_p23);
+                            
+                        /* T */
+                            
+                        __m128d t_tis_l_01 = _mm_load_pd(tis[lftIdx][k][3]);
+                        __m128d t_tis_l_23 = _mm_load_pd(tis[lftIdx][k][3]+2);
+                            
+                        __m128d t_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][3]);
+                        __m128d t_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][3]+2);
+                            
+                        __m128d t_l_p01 = _mm_mul_pd(clL_01,t_tis_l_01);
+                        __m128d t_l_p23 = _mm_mul_pd(clL_23,t_tis_l_23);
+                            
+                        __m128d t_r_p01 = _mm_mul_pd(clR_01,t_tis_r_01);
+                        __m128d t_r_p23 = _mm_mul_pd(clR_23,t_tis_r_23);
+                            
+                        __m128d t_sum_L = _mm_hadd_pd(t_l_p01,t_l_p23);
+                        __m128d t_sum_R = _mm_hadd_pd(t_r_p01,t_r_p23);
+                            
+                            
+                        // now put it all together
+                            
+                        __m128d ac_sum_L = _mm_hadd_pd(a_sum_L,c_sum_L);
+                        __m128d ac_sum_R = _mm_hadd_pd(a_sum_R,c_sum_R);
+                        __m128d gt_sum_L = _mm_hadd_pd(g_sum_L,t_sum_L);
+                        __m128d gt_sum_R = _mm_hadd_pd(g_sum_R,t_sum_R);
+                            
+                            
+                        __m128d ac = _mm_mul_pd(ac_sum_L,ac_sum_R);
+                        __m128d gt = _mm_mul_pd(gt_sum_L,gt_sum_R);
+                                                        
+                        _mm_store_pd(clP,ac);
+                        _mm_store_pd(clP+2,gt);
+                            
+                        clP += 4;
+                        clL += 4;
+                        clR += 4;
+                        
+                    }
+                }
+            }
+            
 				
 			/* scale */
 #			if 1
@@ -222,8 +425,7 @@ double Chunk::lnLikelihood(bool storeScore) {
 		}
 		
 	delete [] lnScaler;
-	
-    //std::cout << "lnL[" << subsetId << "] = " << lnL << std::endl;
+
     
     if (storeScore == true)
         storedLnL = lnL;
