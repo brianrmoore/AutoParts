@@ -24,7 +24,7 @@ Alignment::Alignment(std::string fileName) {
 	matrix = NULL;
 	numTaxa = numChar = 0;
 	bool excludeLine = false, charSetLine = false;
-	bool *tempVec;
+	bool *tempVec = NULL;
 	int pid = 0;
 	while( getline(seqStream, linestring).good() )
 		{
