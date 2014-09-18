@@ -57,23 +57,36 @@ Chunk::Chunk(Alignment* ap, Settings* sp, Model* mp, int si) {
 		{
 		double* clp = clsPtr[i];
         const std::vector<size_t>& chars = charMatrix[i];
-		for (std::vector<size_t>::const_iterator c=chars.begin(); c != chars.end(); ++c)
+        const std::vector<bool>& gaps = gapMatrix[i];
+        for (int j=0; j<numPatterns; ++j)
 			{
+            size_t c = chars[j];
+            bool   g = gaps[j];
 			for (int k=0; k<numGammaCats; k++)
 				{
-                if ( usingAmbiguousCharacters )
+                if ( usingAmbiguousCharacters == true )
                     {
                     int mask = 1;
                     for (int s=0; s<4; s++)
                         {
-                        if ((*c & mask) == 1)
+                        if ((c & mask) == 1)
                             clp[s] = 1.0;
                         mask *= 2;
                         }
                     }
                 else
                     {
-                    clp[*c] = 1.0;
+                    if ( g == true )
+                        { // it's a gap
+                        clp[0] = 1.0;
+                        clp[1] = 1.0;
+                        clp[2] = 1.0;
+                        clp[3] = 1.0;
+                        }
+                    else
+                        {
+                        clp[c] = 1.0;
+                        }
                     }
 				clp += 4;
 				}
@@ -115,6 +128,7 @@ Chunk::~Chunk(void) {
 
 void Chunk::compress( void )
 {
+    bool doCompression = true;
     bool treatAmbiguousAsGaps = false;
 //    bool treatUnknownAsGap = true;
     
@@ -165,45 +179,53 @@ void Chunk::compress( void )
     numSites = (int)includedSites.size();
     std::vector<bool> unique(numSites, true);
     // compress the character matrix
-    // find the unique site patterns and compute their respective frequencies
-    std::map<std::string,size_t> patterns;
-    std::set<int>::iterator it = includedSites.begin();
-    for (size_t site = 0; site < numSites; ++site)
+    if ( doCompression == true )
     {
-        // create the site pattern
-        std::string pattern = "";
-        for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
+        // find the unique site patterns and compute their respective frequencies
+        std::map<std::string,size_t> patterns;
+        std::set<int>::iterator it = includedSites.begin();
+        for (size_t site = 0; site < numSites; ++site, ++it)
         {
-            int nucCode = alignmentPtr->getNucleotide(i, *it);
-            pattern += nucAsStringValue(nucCode);
-        }
-        // check if we have already seen this site pattern
-        std::map<std::string, size_t>::const_iterator index = patterns.find( pattern );
-        if ( index != patterns.end() )
-        {
-            // we have already seen this pattern
-            // increase the frequency counter
-            patternCounts[ index->second ]++;
+            // create the site pattern
+            std::string pattern = "";
+            for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
+            {
+                int nucCode = alignmentPtr->getNucleotide(i, *it);
+                pattern += nucAsStringValue(nucCode);
+            }
+            // check if we have already seen this site pattern
+            std::map<std::string, size_t>::const_iterator index = patterns.find( pattern );
+            if ( index != patterns.end() )
+            {
+                // we have already seen this pattern
+                // increase the frequency counter
+                patternCounts[ index->second ]++;
             
-            // obviously this site isn't unique nor the first encounter
-            unique[site] = false;
-        }
-        else
-        {
-            // create a new pattern frequency counter for this pattern
-            patternCounts.push_back(1);
+                // obviously this site isn't unique nor the first encounter
+                unique[site] = false;
+            }
+            else
+            {
+                // create a new pattern frequency counter for this pattern
+                patternCounts.push_back(1);
                 
-            // insert this pattern with the corresponding index in the map
-            patterns.insert( std::pair<std::string,size_t>(pattern,numPatterns) );
+                // insert this pattern with the corresponding index in the map
+                patterns.insert( std::pair<std::string,size_t>(pattern,numPatterns) );
                 
-            // increase the pattern counter
-            numPatterns++;
+                // increase the pattern counter
+                numPatterns++;
                 
-            // flag that this site is unique (or the first occurence of this pattern)
-            unique[site] = true;
-        }
+                // flag that this site is unique (or the first occurence of this pattern)
+                unique[site] = true;
+            }
         
-        ++it;
+        }
+    }
+    else
+    {
+        // we do not compress
+        numPatterns = numSites;
+        patternCounts = std::vector<size_t>(numSites,1);
     }
     
     
@@ -582,7 +604,7 @@ double Chunk::lnLikelihood(bool storeScore) {
 				like += clP[i] * f[i] * catProb;
 			clP += 4;
 			}
-		lnL += log( like ) * patternCounts[c] + lnScaler[c];
+		lnL += (log( like ) + lnScaler[c]) * patternCounts[c];
 		}
 		
 	delete [] lnScaler;
