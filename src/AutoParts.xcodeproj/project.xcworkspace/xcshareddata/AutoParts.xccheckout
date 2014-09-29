@@ -10,29 +10,29 @@
 	<string>AutoParts</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>4DB9BE23-E96F-42B1-BC92-F15AB310D65B</key>
+		<key>00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB</key>
 		<string>https://github.com/brianrmoore/AutoParts.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>src/AutoParts.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>4DB9BE23-E96F-42B1-BC92-F15AB310D65B</key>
+		<key>00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/brianrmoore/AutoParts.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>4DB9BE23-E96F-42B1-BC92-F15AB310D65B</string>
+	<string>00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>4DB9BE23-E96F-42B1-BC92-F15AB310D65B</string>
+			<string>00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB</string>
 			<key>IDESourceControlWCCName</key>
 			<string>AutoParts</string>
 		</dict>

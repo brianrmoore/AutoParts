@@ -1,3 +1,4 @@
+#include "DualStream.h"
 #include "Model.h"
 #include "Parm.h"
 #include "ParmAsrv.h"
@@ -9,12 +10,12 @@
 
 
 
-Parm::Parm(MbRandom *rp, Model *mp, std::string nm)  {
+Parm::Parm(MbRandom *rp, Model *mp, DualStream* lg, std::string nm)  {
 
-	ranPtr = rp;
+	ranPtr   = rp;
 	parmName = nm;
 	modelPtr = mp;
-	
+	outLog   = lg;
 }
 
 Parm::~Parm(void) {
@@ -89,7 +90,7 @@ Parm &Parm::operator=(Parm &b) {
 			}
 		}
 		
-		std::cout << "Problem in Parameter assignment operator" << std::endl;
+		(*outLog) << "Problem in Parameter assignment operator" << '\n';
 		exit(1);
 			
 		exitOperator:

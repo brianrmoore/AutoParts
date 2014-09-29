@@ -5,12 +5,12 @@
 #include <string>
 
 
-
+class DualStream;
 class MbRandom;
 class SubRates : public Parm {
 
 	public:
-                	              SubRates(MbRandom *rp, Model *mp, std::string nm, double tn);
+                	              SubRates(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double tn);
 								  SubRates(SubRates &s);
                 	              ~SubRates(void);
 					   SubRates   &operator=(SubRates &s);

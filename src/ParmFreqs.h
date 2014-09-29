@@ -11,7 +11,7 @@ class MbRandom;
 class BaseFreqs : public Parm {
 
 	public:
-                	              BaseFreqs(MbRandom *rp, Model *mp, std::string nm, double tn);
+                	              BaseFreqs(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double tn);
 								  BaseFreqs(BaseFreqs &b);
 								 ~BaseFreqs(void);
 					  BaseFreqs   &operator=(BaseFreqs &b);

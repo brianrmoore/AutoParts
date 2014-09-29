@@ -3,6 +3,7 @@
 
 #include <fstream>
 
+class DualStream;
 class MbRandom;
 class Model;
 class Settings;
@@ -10,7 +11,7 @@ class Settings;
 class Mcmc {
 
 	public:
-                	              Mcmc(Settings* sp, Model* mp, MbRandom* rp);  
+                	              Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log);
 								 ~Mcmc(void);
                 	              
 	private:

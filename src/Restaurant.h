@@ -7,6 +7,7 @@
 #include "Table.h"
 
 class Alignment;
+class DualStream;
 class MbRandom;
 class Model;
 class Parm;
@@ -15,7 +16,7 @@ class Settings;
 class Restaurant {
 
 	public:
-                            Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, ParmId pid, int np, double ps);
+                            Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, DualStream* lg, ParmId pid, int np, double ps);
 						   ~Restaurant(void);
 					 bool   change(void);
 					 bool   changeParmOnTable(Table* tbl);
@@ -43,6 +44,7 @@ class Restaurant {
 				MbRandom*   ranPtr;
 				   Model*   modelPtr;
 				Settings*   settingsPtr;
+              DualStream*   outLog;
 				   ParmId   parmId;
 			  std::string   name;
                       int   numPatrons;

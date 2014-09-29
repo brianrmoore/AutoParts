@@ -1,3 +1,4 @@
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "ParmSubrates.h"
 #include <iostream>
@@ -9,7 +10,7 @@
 
 
 
-SubRates::SubRates(MbRandom *rp, Model *mp, std::string nm, double tn) : Parm(rp, mp, nm) {
+SubRates::SubRates(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double tn) : Parm(rp, mp, lg, nm) {
 
 	alpha0 = tn;
 	r = std::vector<double>( 6 );
@@ -20,7 +21,7 @@ SubRates::SubRates(MbRandom *rp, Model *mp, std::string nm, double tn) : Parm(rp
 	normalizeRates(r, MIN_RATE, 1.0);	
 }
 
-SubRates::SubRates(SubRates &s) : Parm(s.ranPtr, s.modelPtr, s.parmName) {
+SubRates::SubRates(SubRates &s) : Parm(s.ranPtr, s.modelPtr, s.outLog, s.parmName) {
 
 	r = std::vector<double>( 6 );
 	a = std::vector<double>( 6 );
@@ -212,8 +213,8 @@ double SubRates::normalizeRates(std::vector<double> &a, double minVal, double to
 
 void SubRates::print(void) {
 
-	std::cout << "SubRates = ";
+	(*outLog) << "SubRates = ";
 	for (int i=0; i<r.size(); i++)
-		std::cout << r[i] << " ";
-	std::cout << std::endl;
+		(*outLog) << r[i] << " ";
+	(*outLog) << '\n';
 }

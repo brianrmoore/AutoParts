@@ -4,10 +4,12 @@
 #include <string>
 #include <vector>
 
+class DualStream;
+
 class Alignment {
 
 	public:
-                	              Alignment(std::string fileName);  
+                	              Alignment(std::string fileName, DualStream* lg);
 								 ~Alignment(void);
                 	       void   compress(void);
                 	        int   getNumTaxa(void) { return numTaxa; }
@@ -38,6 +40,7 @@ class Alignment {
                             int   **matrix;
                             int   **compressedMatrix;
                             int   *patternCount;
+                    DualStream*   log;
 };
 
 #endif

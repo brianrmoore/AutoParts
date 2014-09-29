@@ -4,11 +4,14 @@
 #include <sstream>
 #include <fstream>
 #include "Alignment.h"
+#include "DualStream.h"
 
 
 
-Alignment::Alignment(std::string fileName) {
+Alignment::Alignment(std::string fileName, DualStream* lg) {
 
+    log = lg;
+    
 	/* open the file */
 	std::ifstream seqStream(fileName.c_str());
 	if (!seqStream) 
@@ -41,7 +44,6 @@ Alignment::Alignment(std::string fileName) {
 			word = "";
 			linestream >> word;
 			wordNum++;
-			//cout << "word(" << wordNum << ") = " << word << endl;
 			if (line == 0)
 				{
 				/* read the number of taxa/chars from the first line */
@@ -92,7 +94,6 @@ Alignment::Alignment(std::string fileName) {
 					{
 					if (excludeLine == true || charSetLine == true)
 						{
-						//cout << "exclude: \"" << word << "\"" << endl;
 						for (int i=0; i<word.size(); i++)
 							{
 							if ( isdigit(word.at(i)) )
@@ -152,7 +153,6 @@ Alignment::Alignment(std::string fileName) {
 					theSequence += tolower(site);
 				}
 			}
-		//cout << linestring << endl;
 		line++;
 		}	
 
@@ -412,7 +412,7 @@ void Alignment::listTaxa(void) {
 
 	int i = 1;
 	for (std::vector<std::string>::iterator p=taxonNames.begin(); p != taxonNames.end(); p++)
-		std::cout << std::setw(4) << i++ << " -- " << (*p) << std::endl;
+		(*log) << std::setw(4) << i++ << " -- " << (*p) << '\n';
 
 }
 
@@ -512,7 +512,6 @@ void Alignment::interpretString(std::string s, bool *v, int n) {
 			std::string nextWord = "";
 			if (i != cmds.size() - 1)
 				nextWord = cmds[i+1];
-			//cout << "\"" << prevWord << "\" ** \"" << cmds[i] << "\" ** \"" << nextWord << "\"" << endl;
 			
 			int x;
 			std::istringstream buf(cmds[i]);
@@ -560,15 +559,6 @@ void Alignment::interpretString(std::string s, bool *v, int n) {
 			}
 		i++;
 		}
-#	if 0
-	for (int i=0; i<n; i++)
-		{
-		if (v[i] == true)
-			cout << i+1 << " ";
-		}
-	cout << endl;
-#	endif
-
 }
 
 bool Alignment::isNumber(std::string s) {
@@ -700,31 +690,31 @@ void Alignment::print(void) {
 	else
 		x = compressedMatrix;
 		
-	std::cout << "                ";
+	(*log) << "                ";
 	for (int i=0; i<numTaxa; i++)
-		std::cout << std::setw(3) << i;
-	std::cout << std::endl;
-	std::cout << "----------------------------";
+		(*log) << std::setw(3) << i;
+	(*log) << '\n';
+	(*log) << "----------------------------";
 	for (int i=0; i<numTaxa; i++)
-		std::cout << "---";
-	std::cout << std::endl;	
+		(*log) << "---";
+	(*log) << '\n';
 	for (int j=0; j<numSitePatterns; j++)
 		{
-		std::cout << std::setw(4) << j+1 << " -- ";
-		std::cout << std::setw(4) << patternCount[j] << " -- ";
-		std::cout << std::setw(4) << isExcluded[j];
-		std::cout << std::setw(4) << partitionId[j] << " -- ";
+		(*log) << std::setw(4) << j+1 << " -- ";
+		(*log) << std::setw(4) << patternCount[j] << " -- ";
+		(*log) << std::setw(4) << isExcluded[j];
+		(*log) << std::setw(4) << partitionId[j] << " -- ";
 		for (int i=0; i<numTaxa; i++)
 			{
-			std::cout << std::setw(3) << x[i][j];
+			(*log) << std::setw(3) << x[i][j];
 			}
-		std::cout << std::endl;
+		(*log) << '\n';
 		}
 		
 	int sum = 0;
 	for (int j=0; j<numSitePatterns; j++)
 		sum += patternCount[j];
-	std::cout << "Number of sites = " << sum << std::endl;
+	(*log) << "Number of sites = " << sum << '\n';
 	
 }
 

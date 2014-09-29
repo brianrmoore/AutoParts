@@ -44,12 +44,13 @@ class Node {
 };
 
 class Alignment;
+class DualStream;
 class MbRandom;
 class Tree : public Parm {
 
 	public:
-                	              Tree(MbRandom *rp, Model *mp, std::string nm, Alignment *ap, double lm, double tn);  
-								  Tree(MbRandom *rp, Model *mp, std::string nm, Alignment *ap, double lm, double tn, std::string ts);
+                	              Tree(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, Alignment *ap, double lm, double tn);
+								  Tree(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, Alignment *ap, double lm, double tn, std::string ts);
 								  Tree(Tree &t);
                 	              ~Tree(void);
 						 double   update(void);

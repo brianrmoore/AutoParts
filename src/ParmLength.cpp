@@ -1,11 +1,12 @@
 #include <cmath>
 #include <iostream>
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "ParmLength.h"
 
 
 
-TreeLength::TreeLength(MbRandom *rp, Model *mp, std::string nm, double lm, int nb, double tn) : Parm(rp, mp, nm) {
+TreeLength::TreeLength(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, int nb, double tn) : Parm(rp, mp, lg, nm) {
 
 	numBranches = nb;
 	lambda      = lm;
@@ -13,7 +14,7 @@ TreeLength::TreeLength(MbRandom *rp, Model *mp, std::string nm, double lm, int n
 	length      = ranPtr->gammaRv( numBranches, lambda );
 }
 
-TreeLength::TreeLength(TreeLength &t) : Parm(t.ranPtr, t.modelPtr, t.parmName) {
+TreeLength::TreeLength(TreeLength &t) : Parm(t.ranPtr, t.modelPtr, t.outLog, t.parmName) {
 
 	numBranches = t.numBranches;
 	lambda      = t.lambda;
@@ -73,7 +74,7 @@ double TreeLength::lnPriorProb(void) {
 
 void TreeLength::print(void) {
 
-	std::cout << "Tree Length = " << length << std::endl;
+	(*outLog) << "Tree Length = " << length << '\n';
 	
 }
 

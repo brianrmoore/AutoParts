@@ -1,4 +1,5 @@
 #include "Alignment.h"
+#include "DualStream.h"
 #include "ParmAsrv.h"
 #include "ParmFreqs.h"
 #include "ParmLength.h"
@@ -10,16 +11,18 @@
 
 
 
-Table::Table(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, ParmId pid) {
+Table::Table(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, DualStream* lg, ParmId pid) {
 
 	// remember the location of some objects
 	ranPtr       = rp;
 	settingsPtr  = sp;
 	alignmentPtr = ap;
 	modelPtr     = mp;
+    outLog       = lg;
 	parmId       = pid;
 	curParmId    = 0;
-	makeNewParm();}
+	makeNewParm();
+}
 
 Table::~Table(void) {
 
@@ -34,7 +37,7 @@ Table::~Table(void) {
 			}
 		else
 			{
-			std::cout << "ERROR: Problem deleting Asrv parameter" << std::endl;
+			(*outLog) << "ERROR: Problem deleting Asrv parameter" << '\n';
 			exit(1);
 			}
 		}
@@ -49,7 +52,7 @@ Table::~Table(void) {
 			}
 		else
 			{
-			std::cout << "ERROR: Problem deleting Tree parameter" << std::endl;
+			(*outLog) << "ERROR: Problem deleting Tree parameter" << '\n';
 			exit(1);
 			}
 		}
@@ -64,7 +67,7 @@ Table::~Table(void) {
 			}
 		else
 			{
-			std::cout << "ERROR: Problem deleting SubRates parameter" << std::endl;
+			(*outLog) << "ERROR: Problem deleting SubRates parameter" << '\n';
 			exit(1);
 			}
 		}
@@ -79,7 +82,7 @@ Table::~Table(void) {
 			}
 		else
 			{
-			std::cout << "ERROR: Problem deleting BaseFreqs parameter" << std::endl;
+			(*outLog) << "ERROR: Problem deleting BaseFreqs parameter" << '\n';
 			exit(1);
 			}
 		}
@@ -94,7 +97,7 @@ Table::~Table(void) {
 			}
 		else
 			{
-			std::cout << "ERROR: Problem deleting TreeLength parameter" << std::endl;
+			(*outLog) << "ERROR: Problem deleting TreeLength parameter" << '\n';
 			exit(1);
 			}
 		}
@@ -118,8 +121,8 @@ void Table::makeNewParm(void) {
 
 	if (parmId == ASRV)
 		{
-		parameter[0] = new Asrv( ranPtr, modelPtr, "Asrv", settingsPtr->getAsrvLambda(), settingsPtr->getNumGammaCats(), settingsPtr->getTuningParm("asrv") );
-		parameter[1] = new Asrv( ranPtr, modelPtr, "Asrv", settingsPtr->getAsrvLambda(), settingsPtr->getNumGammaCats(), settingsPtr->getTuningParm("asrv") );
+		parameter[0] = new Asrv( ranPtr, modelPtr, outLog, "Asrv", settingsPtr->getAsrvLambda(), settingsPtr->getNumGammaCats(), settingsPtr->getTuningParm("asrv") );
+		parameter[1] = new Asrv( ranPtr, modelPtr, outLog, "Asrv", settingsPtr->getAsrvLambda(), settingsPtr->getNumGammaCats(), settingsPtr->getTuningParm("asrv") );
 		(*parameter[1]) = (*parameter[0]);
 		}
 	else if (parmId == TREE)
@@ -129,42 +132,42 @@ void Table::makeNewParm(void) {
 		if ( settingsPtr->getTreeFileName() != "" )
 			{
 			treeStr = getLineFromFile( settingsPtr->getTreeFileName(), 0 );
-			parameter[0] = new Tree( ranPtr, modelPtr, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree"), treeStr );
-			parameter[1] = new Tree( ranPtr, modelPtr, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree"), treeStr );
+			parameter[0] = new Tree( ranPtr, modelPtr, outLog, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree"), treeStr );
+			parameter[1] = new Tree( ranPtr, modelPtr, outLog, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree"), treeStr );
 			}
 		else
 			{
-			parameter[0] = new Tree( ranPtr, modelPtr, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree") );
-			parameter[1] = new Tree( ranPtr, modelPtr, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree") );
+			parameter[0] = new Tree( ranPtr, modelPtr, outLog, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree") );
+			parameter[1] = new Tree( ranPtr, modelPtr, outLog, "Tree", alignmentPtr, settingsPtr->getBrlenLambda(), settingsPtr->getTuningParm("tree") );
 			}
 		(*parameter[1]) = (*parameter[0]);
 		}
 	else if (parmId == SUBRATE)
 		{
-		parameter[0] = new SubRates( ranPtr, modelPtr, "Rates", settingsPtr->getTuningParm("rates") );
-		parameter[1] = new SubRates( ranPtr, modelPtr, "Rates", settingsPtr->getTuningParm("rates") );
+		parameter[0] = new SubRates( ranPtr, modelPtr, outLog, "Rates", settingsPtr->getTuningParm("rates") );
+		parameter[1] = new SubRates( ranPtr, modelPtr, outLog, "Rates", settingsPtr->getTuningParm("rates") );
 		(*parameter[1]) = (*parameter[0]);
 		}
 	else if (parmId == BASEFREQ)
 		{
-		parameter[0] = new BaseFreqs( ranPtr, modelPtr, "Freqs", settingsPtr->getTuningParm("freqs") );
-		parameter[1] = new BaseFreqs( ranPtr, modelPtr, "Freqs", settingsPtr->getTuningParm("freqs") );
+		parameter[0] = new BaseFreqs( ranPtr, modelPtr, outLog, "Freqs", settingsPtr->getTuningParm("freqs") );
+		parameter[1] = new BaseFreqs( ranPtr, modelPtr, outLog, "Freqs", settingsPtr->getTuningParm("freqs") );
 		(*parameter[1]) = (*parameter[0]);
 		}
 	else if (parmId == LENGTH)
 		{
-		parameter[0] = new TreeLength( ranPtr, modelPtr, "Length", settingsPtr->getBrlenLambda(), 2*alignmentPtr->getNumTaxa()-3, settingsPtr->getTuningParm("length") );
-		parameter[1] = new TreeLength( ranPtr, modelPtr, "Length", settingsPtr->getBrlenLambda(), 2*alignmentPtr->getNumTaxa()-3, settingsPtr->getTuningParm("length") );
+		parameter[0] = new TreeLength( ranPtr, modelPtr, outLog, "Length", settingsPtr->getBrlenLambda(), 2*alignmentPtr->getNumTaxa()-3, settingsPtr->getTuningParm("length") );
+		parameter[1] = new TreeLength( ranPtr, modelPtr, outLog, "Length", settingsPtr->getBrlenLambda(), 2*alignmentPtr->getNumTaxa()-3, settingsPtr->getTuningParm("length") );
 		(*parameter[1]) = (*parameter[0]);
 		}
 }
 
 void Table::print(void) {
 
-	std::cout << "Patrons at table: \"";
+	(*outLog) << "Patrons at table: \"";
 	for (std::set<int>::iterator p = patrons.begin(); p != patrons.end(); p++)
-		std::cout << (*p);
-	std::cout << "\"" << std::endl;
+		(*outLog) << (*p);
+	(*outLog) << "\"" << '\n';
 	parameter[curParmId]->print();
 }
 

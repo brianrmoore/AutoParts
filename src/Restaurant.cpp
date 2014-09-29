@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include "Chunk.h"
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "Model.h"
 #include "Parm.h"
@@ -14,13 +15,14 @@
 
 
 
-Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, ParmId pid, int np, double ps) {
+Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, DualStream* lg, ParmId pid, int np, double ps) {
 
 	// remember the location of some objects
 	ranPtr            = rp;
 	settingsPtr       = sp;
 	alignmentPtr      = ap;
 	modelPtr          = mp;
+    outLog            = lg;
 	parmId            = pid;
 
 	// initalize parameters
@@ -57,7 +59,7 @@ Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, Par
 	// seat the patrons in the restaurant
 	if (probUpdateSeating < 0.0000001)
 		{
-		Table* tbl = new Table( ranPtr, settingsPtr, alignmentPtr, modelPtr, parmId );
+		Table* tbl = new Table( ranPtr, settingsPtr, alignmentPtr, modelPtr, outLog, parmId );
 		tables.insert( tbl );
 		for (int i=0; i<numPatrons; i++)
 			tbl->seatPatron( i );
@@ -70,7 +72,7 @@ Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, Par
 			double u = ranPtr->uniformRv();
 			if (u < newTableProb)
 				{
-				Table* tbl = new Table( ranPtr, settingsPtr, alignmentPtr, modelPtr, parmId );
+				Table* tbl = new Table( ranPtr, settingsPtr, alignmentPtr, modelPtr, outLog, parmId );
 				tables.insert( tbl );
 				tbl->seatPatron( i );
 				}
@@ -341,7 +343,7 @@ void Restaurant::print(void) {
 	int i = 0;
 	for (std::set<Table*>::iterator p=tables.begin(); p != tables.end(); p++)
 		{
-		std::cout << "Table " << ++i << std::endl;
+		(*outLog) << "Table " << ++i << '\n';
 		(*p)->print();
 		}
 }
@@ -444,7 +446,7 @@ void Restaurant::updateSeating(int patron) {
 	// make some auxiliary tables
 	for (int i=0; i<numAuxTables; i++)
 		{
-		Table* tbl = new Table(ranPtr, settingsPtr, alignmentPtr, modelPtr, parmId);
+		Table* tbl = new Table(ranPtr, settingsPtr, alignmentPtr, modelPtr, outLog, parmId);
 		tables.insert( tbl ); 
 		}
 

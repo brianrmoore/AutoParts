@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <fstream>
+#include "DualStream.h"
 #include "Mcmc.h"
 #include "Model.h"
 #include "Restaurant.h"
@@ -9,7 +10,7 @@
 
 
 
-Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp) {
+Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 
 	// remember some pointers that we will need
 	settingsPtr = sp;
@@ -46,11 +47,11 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp) {
 		/* print information to the screen */
 		if ( n % settingsPtr->getPrintFrequency() == 0 )
 			{
-			std::cout << std::setw(6) << n << " -- " << std::fixed << std::setprecision(3) << newLnL << " ";
+			log << std::setw(6) << n << " -- " << std::fixed << std::setprecision(3) << newLnL << " ";
 			for (int i=0; i<modelPtr->getNumRestaurants(); i++)
-				std::cout << std::setw(2) << modelPtr->getRestaurant(i)->getNumTables() << " ";
-			std::cout << rest->getName();
-			std::cout << std::endl;
+				log << std::setw(2) << modelPtr->getRestaurant(i)->getNumTables() << " ";
+			log << rest->getName();
+			log << '\n';
 			}
 		for (int i=0; i<modelPtr->getNumRestaurants(); i++)
 			mean[i] += modelPtr->getRestaurant(i)->getNumTables();
@@ -67,7 +68,7 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp) {
 		}
 	
 	for (int i=0; i<modelPtr->getNumRestaurants(); i++)
-		std::cout << i << " -- " << std::fixed << std::setprecision(4) << mean[i] / settingsPtr->getChainLength() << std::endl;
+		log << i << " -- " << std::fixed << std::setprecision(4) << mean[i] / settingsPtr->getChainLength() << '\n';
 	
 	/* print information on acceptances */
 	int longestName = 0;
@@ -77,28 +78,28 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp) {
 		if (restaurantName.size() > longestName)
 			longestName = (int)restaurantName.size();
 		}
-	std::cout << std::endl;
-	std::cout << "Parm";
+	log << '\n';
+	log << "Parm";
 	for (int j=0; j<longestName - 4; j++)
-		std::cout << " ";
-	std::cout << "  ";
-	std::cout << std::setw(5) << "Tries" << " ";
-	std::cout << std::setw(5) << "Accep" << " ";
-	std::cout << std::setw(5) << "Rate" << std::endl;
+		log << " ";
+	log << "  ";
+	log << std::setw(5) << "Tries" << " ";
+	log << std::setw(5) << "Accep" << " ";
+	log << std::setw(5) << "Rate" << '\n';
 	for (int i=0; i<modelPtr->getNumRestaurants(); i++)
 		{
 		std::string restaurantName = modelPtr->getRestaurant(i)->getName();
-		std::cout << restaurantName;
+		log << restaurantName;
 		for (int j=0; j<longestName - restaurantName.size(); j++)
-			std::cout << " ";
-		std::cout << "  ";
-		std::cout << std::setw(5) << numAttempted[i] << " ";
-		std::cout << std::setw(5) << numAccepted[i] << " ";
+			log << " ";
+		log << "  ";
+		log << std::setw(5) << numAttempted[i] << " ";
+		log << std::setw(5) << numAccepted[i] << " ";
 		if (numAttempted[i] > 0)
-			std::cout << std::fixed << std::setprecision(2) << std::setw(5) << (double)numAccepted[i] / numAttempted[i];
+			log << std::fixed << std::setprecision(2) << std::setw(5) << (double)numAccepted[i] / numAttempted[i];
 		else
-			std::cout << std::setw(5) << "N/A";
-		std::cout << std::endl;
+			log << std::setw(5) << "N/A";
+		log << '\n';
 		}
 
 	delete [] numAccepted;

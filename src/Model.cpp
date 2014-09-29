@@ -1,5 +1,6 @@
 #include "Alignment.h"
 #include "Chunk.h"
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "Model.h"
 #include "ParmAsrv.h"
@@ -13,12 +14,13 @@
 
 
 
-Model::Model(Settings* sp, MbRandom* rp, Alignment* ap) {
+Model::Model(Settings* sp, MbRandom* rp, Alignment* ap, DualStream* lg) {
 
 	// remember the location of important objects
 	settingsPtr  = sp;
 	ranPtr       = rp;
 	alignmentPtr = ap;
+    log          = lg;
 	
 	// initialize important variables
 	numSubsets   = alignmentPtr->getNumSubsets();
@@ -31,11 +33,11 @@ Model::Model(Settings* sp, MbRandom* rp, Alignment* ap) {
 	stateSets = new StateSets(alignmentPtr, settingsPtr);
 
 	// set up the parameters
-	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, TREE,     numSubsets, 0.0) );
-	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, ASRV,     numSubsets, 0.5) );
-	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, SUBRATE,  numSubsets, 0.5) );
-	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, BASEFREQ, numSubsets, 0.5) );
-	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, LENGTH,   numSubsets, 0.5) );
+	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, log, TREE,     numSubsets, 0.0) );
+	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, log, ASRV,     numSubsets, 0.5) );
+	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, log, SUBRATE,  numSubsets, 0.5) );
+	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, log, BASEFREQ, numSubsets, 0.5) );
+	restaurants.push_back( new Restaurant(ranPtr, settingsPtr, alignmentPtr, this, log, LENGTH,   numSubsets, 0.5) );
 
 	// calculate the probability of changing each parameter (note that the probabilities are in the same order as the restaurants, above) */
 	proposalProb.push_back( 3 );
@@ -210,7 +212,6 @@ double Model::lnLikelihood(bool storeScore) {
 		{
 		lnL += chunks[i]->lnLikelihood(storeScore);
 		}
-    //std::cout << "lnL[] = " << lnL << std::endl;
 	return lnL;
 }
 

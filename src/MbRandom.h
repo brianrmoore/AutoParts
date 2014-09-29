@@ -585,7 +585,6 @@ inline double MbRandom::poissonQuantile(double lambda, double p) {
 		if ( sumOld <= p && p <= sum )
 			return i;
 		}
-	//cout << "Poisson quantile warning" << endl;
 	return xmax;
 }
 

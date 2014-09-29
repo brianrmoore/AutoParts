@@ -4,12 +4,13 @@
 #include <string>
 
 
+class DualStream;
 class MbRandom;
 class Model;
 class Parm {
 
 	public:
-                	              Parm(MbRandom* rp, Model* mp, std::string nm);  
+                	              Parm(MbRandom* rp, Model* mp, DualStream* lg, std::string nm);
 								 ~Parm(void);
 						  Parm&   operator=(Parm& b);
 				   virtual void   print(void)=0;
@@ -22,6 +23,7 @@ class Parm {
 	protected:
 					  MbRandom*   ranPtr;
 						 Model*   modelPtr;
+                    DualStream*   outLog;
 					std::string   parmName;
                             
 };

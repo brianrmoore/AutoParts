@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include "Alignment.h"
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "Model.h"
 #include "ParmTree.h"
@@ -27,7 +28,7 @@ Node::Node(void) {
 	marked     = false;
 }
 
-Tree::Tree(MbRandom *rp, Model *mp, std::string nm, Alignment *ap, double lm, double tn) : Parm(rp, mp, nm) {
+Tree::Tree(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, Alignment *ap, double lm, double tn) : Parm(rp, mp, lg, nm) {
 
 	isTreeFixed  = false;
 	alpha0       = tn;
@@ -38,7 +39,7 @@ Tree::Tree(MbRandom *rp, Model *mp, std::string nm, Alignment *ap, double lm, do
 	buildRandomTree();
 }
 
-Tree::Tree(MbRandom *rp, Model *mp, std::string nm, Alignment *ap, double lm, double tn, std::string ts) : Parm(rp, mp, nm) {
+Tree::Tree(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, Alignment *ap, double lm, double tn, std::string ts) : Parm(rp, mp, lg, nm) {
 
 	isTreeFixed  = true;
 	alpha0       = tn;
@@ -49,7 +50,7 @@ Tree::Tree(MbRandom *rp, Model *mp, std::string nm, Alignment *ap, double lm, do
 	buildTreeFromNewickDescription(ts);
 }
 
-Tree::Tree(Tree &t) : Parm(t.ranPtr, t.modelPtr, t.parmName) {
+Tree::Tree(Tree &t) : Parm(t.ranPtr, t.modelPtr, t.outLog, t.parmName) {
 
 	isTreeFixed      = false;
 	alpha0           = 0.0;
@@ -1919,14 +1920,14 @@ void Tree::showNodes(Node *p, int indent) {
 	if (p != NULL)
 		{
 		for (int i=0; i<indent; i++)
-			std::cout << " ";
-		std::cout << dex(p) << " (" << dex(p->getLft()) << ", " << dex(p->getRht()) << ", " << dex(p->getAnc()) << ") " << std::fixed << std::setprecision(5) << p->getP();
+			(*outLog) << " ";
+		(*outLog) << dex(p) << " (" << dex(p->getLft()) << ", " << dex(p->getRht()) << ", " << dex(p->getAnc()) << ") " << std::fixed << std::setprecision(5) << p->getP();
 		if (p->getIsLeaf() == true )
-			std::cout << " (" << p->getName() << ") ";
+			(*outLog) << " (" << p->getName() << ") ";
 		if (p == root)
-			std::cout << " <- Root" << std::endl;
+			(*outLog) << " <- Root" << '\n';
 		else
-			std::cout << std::endl;
+			(*outLog) << '\n';
 		showNodes (p->getLft(),  indent + 2);
 		showNodes (p->getRht(), indent + 2);
 		}

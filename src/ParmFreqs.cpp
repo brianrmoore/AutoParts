@@ -1,3 +1,4 @@
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "ParmFreqs.h"
 #include <iostream>
@@ -6,7 +7,7 @@
 
 #pragma mark Constructors
 
-BaseFreqs::BaseFreqs(MbRandom *rp, Model *mp, std::string nm, double tn) : Parm(rp, mp, nm) {
+BaseFreqs::BaseFreqs(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double tn) : Parm(rp, mp, lg, nm) {
 
 	f = std::vector<double>( 4 );
 	a = std::vector<double>( 4 );
@@ -17,7 +18,7 @@ BaseFreqs::BaseFreqs(MbRandom *rp, Model *mp, std::string nm, double tn) : Parm(
 		
 }
 
-BaseFreqs::BaseFreqs(BaseFreqs &b) : Parm(b.ranPtr, b.modelPtr, b.parmName) {
+BaseFreqs::BaseFreqs(BaseFreqs &b) : Parm(b.ranPtr, b.modelPtr, b.outLog, b.parmName) {
 
 	f = std::vector<double>( 4 );
 	a = std::vector<double>( 4 );
@@ -101,9 +102,9 @@ void BaseFreqs::clone(BaseFreqs &b) {
 
 void BaseFreqs::print(void) {
 
-	std::cout << "Base Freqs = ";
+	(*outLog) << "Base Freqs = ";
 	for (int i=0; i<f.size(); i++)
-		std::cout << f[i] << " ";
-	std::cout << std::endl;	
+		(*outLog) << f[i] << " ";
+	(*outLog) << '\n';
 }
 

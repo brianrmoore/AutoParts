@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include "DualStream.h"
 #include "MbRandom.h"
 #include "Parm.h"
 #include "ParmAsrv.h"
@@ -7,7 +8,7 @@
 
 
 
-Asrv::Asrv(MbRandom *rp, Model *mp, std::string nm, double lm, int nc, double tn) : Parm(rp, mp, nm) {
+Asrv::Asrv(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, int nc, double tn) : Parm(rp, mp, lg, nm) {
 
 	lambda  = lm;
 	tuning  = tn;
@@ -18,7 +19,7 @@ Asrv::Asrv(MbRandom *rp, Model *mp, std::string nm, double lm, int nc, double tn
 	
 }
 
-Asrv::Asrv(Asrv &a) : Parm(a.ranPtr, a.modelPtr, a.parmName) {
+Asrv::Asrv(Asrv &a) : Parm(a.ranPtr, a.modelPtr, a.outLog, a.parmName) {
 
 	r = std::vector<double>( a.numCats );
 	clone(a);
@@ -72,7 +73,7 @@ std::string Asrv::getParmHeader(int n) {
 
 void Asrv::print(void) {
 
-	std::cout << "alpha = " << alpha << std::endl;
+	(*outLog) << "alpha = " << alpha << '\n';
 	
 }
 

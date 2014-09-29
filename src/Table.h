@@ -7,6 +7,7 @@
 enum ParmId { ASRV, TREE, SUBRATE, BASEFREQ, LENGTH };
 
 class Alignment;
+class DualStream;
 class MbRandom;
 class Model;
 class Parm;
@@ -15,7 +16,7 @@ class Settings;
 class Table {
 
 	public:
-                            Table(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, ParmId pid);
+                            Table(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, DualStream* lg, ParmId pid);
 						   ~Table(void);
 					 void   flipCurParmId(void) { (curParmId == 0 ? curParmId = 1 : curParmId = 0); }
 					Parm*   getParm(void) { return parameter[curParmId]; }
@@ -34,6 +35,7 @@ class Table {
 				MbRandom*   ranPtr;
 				   Model*   modelPtr;
 				Settings*   settingsPtr;
+              DualStream*   outLog;
 					Parm*   parameter[2];
 				      int   curParmId;
 				   ParmId   parmId;

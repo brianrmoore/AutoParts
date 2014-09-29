@@ -6,12 +6,12 @@
 #include <vector>
 
 
-
+class DualStream;
 class MbRandom;
 class Asrv : public Parm {
 
 	public:
-                	              Asrv(MbRandom *rp, Model *mp, std::string nm, double lm, int nc, double tn);  
+                	              Asrv(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, int nc, double tn);
 								  Asrv(Asrv &a);
                 	              ~Asrv(void);
 						  Asrv&   operator=(Asrv &a);

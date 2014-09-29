@@ -3,11 +3,12 @@
 
 #include "Parm.h"
 
+class DualStream;
 class MbRandom;
 class TreeLength : public Parm {
 
 	public:
-                	              TreeLength(MbRandom *rp, Model *mp, std::string nm, double lm, int nb, double tn);  
+                	              TreeLength(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, int nb, double tn);
 								  TreeLength(TreeLength &t);
 								 ~TreeLength(void);
 					 TreeLength   &operator=(TreeLength &t);

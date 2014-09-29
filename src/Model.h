@@ -7,6 +7,7 @@ class Alignment;
 class Asrv;
 class BaseFreqs;
 class Chunk;
+class DualStream;
 class MbRandom;
 class Restaurant;
 class Settings;
@@ -19,7 +20,7 @@ class TreeLength;
 class Model {
 
 	public:
-                            Model(Settings* sp, MbRandom* rp, Alignment* ap);
+                            Model(Settings* sp, MbRandom* rp, Alignment* ap, DualStream* lg);
 						   ~Model(void);
 					Asrv*   findAsrv(int part);
 			   BaseFreqs*   findBaseFreqs(int part);
@@ -42,6 +43,7 @@ class Model {
 				MbRandom*   ranPtr;
 				Settings*   settingsPtr;
 			   Alignment*   alignmentPtr;
+              DualStream*   log;
 	  std::vector<Chunk*>   chunks;
 			   StateSets*   stateSets;
  std::vector<Restaurant*>   restaurants;

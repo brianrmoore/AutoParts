@@ -7,15 +7,12 @@
 #include "Model.h"
 #include "Settings.h"
 
-void printHeader(void);
+void printHeader(DualStream& log);
 
 
 
 int main (int argc, char* argv[]) {
     
-    // print header
-    printHeader();
-
 	// initialize
 	Settings mySettings(argc, argv);
 	MbRandom myRandom;
@@ -25,24 +22,27 @@ int main (int argc, char* argv[]) {
 	std::ofstream logFstrm;
     logFstrm.open( logFileName.c_str(), std::ios::out );
     DualStream log = DualStream(std::cout, logFstrm);
+
+    // print header
+    printHeader(log);
 	
 	// read the data
-	Alignment myAlignment( mySettings.getDataFilePathName() );
+	Alignment myAlignment( mySettings.getDataFilePathName(), &log );
 	
 	// set up the model
-	Model myModel( &mySettings, &myRandom, &myAlignment );
+	Model myModel( &mySettings, &myRandom, &myAlignment, &log );
 	
 	// run the Markov chain Monte Carlo analysis
-	Mcmc myMcmc( &mySettings, &myModel, &myRandom );
+	Mcmc myMcmc( &mySettings, &myModel, &myRandom, log );
 
     logFstrm.close();
 
     return 0;
 }
 
-void printHeader(void) {
+void printHeader(DualStream& log) {
 
-    std::cout << "AutoParts v 1.0" << std::endl;
-    std::cout << "John P. Huelsenbeck and Brian Moore" << std::endl;
-    std::cout << "University of California, Bervis" << std::endl;
+    log << "AutoParts v 1.0\n";
+    log << "John P. Huelsenbeck and Brian Moore\n";
+    log << "University of California, Bervis\n";
 }
