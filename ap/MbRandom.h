@@ -570,7 +570,7 @@ inline double MbRandom::poissonQuantile(double lambda, double p) {
 	for (int i=0; i<=xmax; i++)
 		{
 		double sumOld = sum;
-		double newVal = 0.0;
+		double newVal;
 		if ( i == 0 )
 			{
 			newVal = exp(-lambda);
@@ -585,6 +585,7 @@ inline double MbRandom::poissonQuantile(double lambda, double p) {
 		if ( sumOld <= p && p <= sum )
 			return i;
 		}
+	//cout << "Poisson quantile warning" << endl;
 	return xmax;
 }
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <map>
 #include <set>
 #include "Alignment.h"
 #include "Chunk.h"
@@ -12,6 +13,11 @@
 #include "ParmSubrates.h"
 #include "ParmTree.h"
 #include "Settings.h"
+
+
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
 
 
 
@@ -34,33 +40,54 @@ Chunk::Chunk(Alignment* ap, Settings* sp, Model* mp, int si) {
 		if ( alignmentPtr->getIsExcluded(i) == false && alignmentPtr->getPartitionId(i) == subsetId + 1 )
 			includedSites.insert(i);
 		}
-	numSites = (int)includedSites.size();
+    
+    compress();
 	
 	// allocate the space for the conditional likelihoods for the chunk
-	int condLikeSize = numNodes * numSites * 4 * numGammaCats;
+	int condLikeSize = numNodes * numPatterns * 4 * numGammaCats;
 	cls = new double[condLikeSize];
 	for (int i=0; i<condLikeSize; i++)
 		cls[i] = 0.0;
 	clsPtr = new double*[numNodes];
 	for (int i=0; i<numNodes; i++)
-		clsPtr[i] = &cls[i * numSites * 4 * numGammaCats];
+		clsPtr[i] = &cls[i * numPatterns * 4 * numGammaCats];
 		
 	// initialize the conditional likelihoods for the chunk
 	for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
 		{
 		double* clp = clsPtr[i];
-		for (std::set<int>::iterator c=includedSites.begin(); c != includedSites.end(); c++)
+        const std::vector<size_t>& chars = charMatrix[i];
+        const std::vector<bool>& gaps = gapMatrix[i];
+        for (int j=0; j<numPatterns; ++j)
 			{
-			int nucCode = alignmentPtr->getNucleotide(i, (*c));
-			int nucs[4];
-			alignmentPtr->getPossibleNucs(nucCode, nucs);
+            size_t c = chars[j];
+            bool   g = gaps[j];
 			for (int k=0; k<numGammaCats; k++)
 				{
-				for (int s=0; s<4; s++)
-					{
-					if (nucs[s] == 1)
-						clp[s] = 1.0;
-					}
+                if ( usingAmbiguousCharacters == true )
+                    {
+                    int mask = 1;
+                    for (int s=0; s<4; s++)
+                        {
+                        if ((c & mask) == 1)
+                            clp[s] = 1.0;
+                        mask *= 2;
+                        }
+                    }
+                else
+                    {
+                    if ( g == true )
+                        { // it's a gap
+                        clp[0] = 1.0;
+                        clp[1] = 1.0;
+                        clp[2] = 1.0;
+                        clp[3] = 1.0;
+                        }
+                    else
+                        {
+                        clp[c] = 1.0;
+                        }
+                    }
 				clp += 4;
 				}
 			}
@@ -98,6 +125,167 @@ Chunk::~Chunk(void) {
 	delete tiMatrix;
 }
 
+
+void Chunk::compress( void )
+{
+    bool doCompression = true;
+    bool treatAmbiguousAsGaps = false;
+//    bool treatUnknownAsGap = true;
+    
+    charMatrix.clear();
+    gapMatrix.clear();
+    patternCounts.clear();
+    numPatterns = 0;
+    
+    // resize the matrices
+    charMatrix.resize(alignmentPtr->getNumTaxa());
+    gapMatrix.resize(alignmentPtr->getNumTaxa());
+    
+    
+    // check whether there are ambiguous characters (besides gaps)
+    bool ambiguousCharacters = false;
+
+    // find the unique site patterns and compute their respective frequencies
+    for (std::set<int>::iterator it = includedSites.begin(); it != includedSites.end(); ++it)
+    {
+        int site = *it;
+        for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
+        {
+            int nucCode = alignmentPtr->getNucleotide(i, site);
+            
+            // if we treat unknown characters as gaps and this is an unknown character then we change it
+            // because we might then have a pattern more
+            if ( treatAmbiguousAsGaps && isAmbiguous(nucCode) )
+            {
+                nucCode = 15;
+            }
+            else if ( nucCode != 15 && isAmbiguous(nucCode) )
+            {
+                ambiguousCharacters = true;
+                break;
+            }
+        }
+        
+        // break the loop if there was an ambiguous character
+        if ( ambiguousCharacters )
+        {
+            break;
+        }
+    }
+    
+    // set the global variable if we use ambiguous characters
+    usingAmbiguousCharacters = ambiguousCharacters;
+    
+    numSites = (int)includedSites.size();
+    std::vector<bool> unique(numSites, true);
+    // compress the character matrix
+    if ( doCompression == true )
+    {
+        // find the unique site patterns and compute their respective frequencies
+        std::map<std::string,size_t> patterns;
+        std::set<int>::iterator it = includedSites.begin();
+        for (size_t site = 0; site < numSites; ++site, ++it)
+        {
+            // create the site pattern
+            std::string pattern = "";
+            for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
+            {
+                int nucCode = alignmentPtr->getNucleotide(i, *it);
+                pattern += nucAsStringValue(nucCode);
+            }
+            // check if we have already seen this site pattern
+            std::map<std::string, size_t>::const_iterator index = patterns.find( pattern );
+            if ( index != patterns.end() )
+            {
+                // we have already seen this pattern
+                // increase the frequency counter
+                patternCounts[ index->second ]++;
+            
+                // obviously this site isn't unique nor the first encounter
+                unique[site] = false;
+            }
+            else
+            {
+                // create a new pattern frequency counter for this pattern
+                patternCounts.push_back(1);
+                
+                // insert this pattern with the corresponding index in the map
+                patterns.insert( std::pair<std::string,size_t>(pattern,numPatterns) );
+                
+                // increase the pattern counter
+                numPatterns++;
+                
+                // flag that this site is unique (or the first occurence of this pattern)
+                unique[site] = true;
+            }
+        
+        }
+    }
+    else
+    {
+        // we do not compress
+        numPatterns = numSites;
+        patternCounts = std::vector<size_t>(numSites,1);
+    }
+    
+    
+    // allocate and fill the cells of the matrices
+    for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
+    {
+     
+        // resize the column
+        charMatrix[i].resize(numPatterns);
+        gapMatrix[i].resize(numPatterns);
+        size_t patternIndex = 0;
+        std::set<int>::iterator it = includedSites.begin();
+        for (size_t site = 0; site < numSites; ++site, ++it)
+        {
+            // only add this site if it is unique
+            if ( unique[site] )
+            {
+                int nucCode = alignmentPtr->getNucleotide(i, *it);
+                gapMatrix[i][patternIndex] = (nucCode == 15);
+                    
+                if ( ambiguousCharacters )
+                {
+                    // we use the actual state
+                    charMatrix[i][patternIndex] = nucCode;
+                }
+                else
+                {
+                    // we use the index of the state
+                    size_t index = 0;
+                    unsigned long state = nucCode;
+                    state >>= 1;
+                        
+                    while ( state != 0 ) // there are still observed states left
+                    {
+                            
+                        // remove this state from the observed states
+                        state >>= 1;
+                            
+                        // increment the index
+                        ++index;
+                    } // end-while over all observed states for this character
+                        
+                    charMatrix[i][patternIndex] = index;
+                }
+                    
+                // increase the pattern index
+                patternIndex++;
+            }
+        }
+    }
+    
+}
+
+
+bool Chunk::isAmbiguous(int nc)
+{
+    
+    return !(nc == 1 || nc == 2 || nc == 4 || nc == 8);
+}
+
 double Chunk::lnLikelihood(bool storeScore) {
 
 	// update the transition probabilities
@@ -109,17 +297,18 @@ double Chunk::lnLikelihood(bool storeScore) {
 		
 	/* pass down tree, filling in conditional likelihoods using the sum-product algorithm
 	   (Felsenstein pruning algorithm) */
-	double *lnScaler = new double[numSites];
-	for (int i=0; i<numSites; i++)
+	double *lnScaler = new double[numPatterns];
+	for (int i=0; i<numPatterns; i++)
 		lnScaler[i] = 0.0;
 		
+    
 	for (int n=0; n<treePtr->getNumNodes(); n++)
-		{
+    {
 		Node* p = treePtr->getDownPassNode( n );
 		if ( p->getIsLeaf() == false )
-			{
+        {
 			if (p->getAnc()->getAnc() == NULL)
-				{
+            {
 				/* three-way split */
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
@@ -129,30 +318,145 @@ double Chunk::lnLikelihood(bool storeScore) {
 				double *clR = getClsForNode(rhtIdx);
 				double *clA = getClsForNode(ancIdx);
 				double *clP = getClsForNode(idx   );
-				for (int c=0; c<numSites; c++)
-					{
+				for (int c=0; c<numPatterns; c++)
+                {
 					for (int k=0; k<numGammaCats; k++)
-						{
-						for (int i=0; i<4; i++)
-							{
-							double sumL = 0.0, sumR = 0.0, sumA = 0.0;
-							for (int j=0; j<4; j++)
-								{
-								sumL += clL[j] * tis[lftIdx][k][i][j];
-								sumR += clR[j] * tis[rhtIdx][k][i][j];
-								sumA += clA[j] * tis[idx   ][k][i][j];
-								}
-							clP[i] = sumL * sumR * sumA;
-							}
-						clP += 4;
-						clL += 4;
-						clR += 4;
-						clA += 4;
-						}
-					}
-				}
+                    {
+                            
+                        __m128d clL_01 = _mm_load_pd(clL);
+                        __m128d clL_23 = _mm_load_pd(clL+2);
+                            
+                        __m128d clR_01 = _mm_load_pd(clR);
+                        __m128d clR_23 = _mm_load_pd(clR+2);
+                            
+                        __m128d clA_01 = _mm_load_pd(clA);
+                        __m128d clA_23 = _mm_load_pd(clA+2);
+                        
+                        /* A */
+                        
+                        __m128d a_tis_l_01 = _mm_load_pd(tis[lftIdx][k][0]);
+                        __m128d a_tis_l_23 = _mm_load_pd(tis[lftIdx][k][0]+2);
+                            
+                        __m128d a_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][0]);
+                        __m128d a_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][0]+2);
+                            
+                        __m128d a_tis_a_01 = _mm_load_pd(tis[   idx][k][0]);
+                        __m128d a_tis_a_23 = _mm_load_pd(tis[   idx][k][0]+2);
+                            
+                        __m128d a_l_p01 = _mm_mul_pd(clL_01,a_tis_l_01);
+                        __m128d a_l_p23 = _mm_mul_pd(clL_23,a_tis_l_23);
+                            
+                        __m128d a_r_p01 = _mm_mul_pd(clR_01,a_tis_r_01);
+                        __m128d a_r_p23 = _mm_mul_pd(clR_23,a_tis_r_23);
+                            
+                        __m128d a_a_p01 = _mm_mul_pd(clA_01,a_tis_a_01);
+                        __m128d a_a_p23 = _mm_mul_pd(clA_23,a_tis_a_23);
+                            
+                        __m128d a_sum_L = _mm_hadd_pd(a_l_p01,a_l_p23);
+                        __m128d a_sum_R = _mm_hadd_pd(a_r_p01,a_r_p23);
+                        __m128d a_sum_A = _mm_hadd_pd(a_a_p01,a_a_p23);
+                            
+                        /* C */
+                            
+                        __m128d c_tis_l_01 = _mm_load_pd(tis[lftIdx][k][1]);
+                        __m128d c_tis_l_23 = _mm_load_pd(tis[lftIdx][k][1]+2);
+                            
+                        __m128d c_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][1]);
+                        __m128d c_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][1]+2);
+                            
+                        __m128d c_tis_a_01 = _mm_load_pd(tis[   idx][k][1]);
+                        __m128d c_tis_a_23 = _mm_load_pd(tis[   idx][k][1]+2);
+                            
+                        __m128d c_l_p01 = _mm_mul_pd(clL_01,c_tis_l_01);
+                        __m128d c_l_p23 = _mm_mul_pd(clL_23,c_tis_l_23);
+                            
+                        __m128d c_r_p01 = _mm_mul_pd(clR_01,c_tis_r_01);
+                        __m128d c_r_p23 = _mm_mul_pd(clR_23,c_tis_r_23);
+                            
+                        __m128d c_a_p01 = _mm_mul_pd(clA_01,c_tis_a_01);
+                        __m128d c_a_p23 = _mm_mul_pd(clA_23,c_tis_a_23);
+                            
+                        __m128d c_sum_L = _mm_hadd_pd(c_l_p01,c_l_p23);
+                        __m128d c_sum_R = _mm_hadd_pd(c_r_p01,c_r_p23);
+                        __m128d c_sum_A = _mm_hadd_pd(c_a_p01,c_a_p23);
+                            
+                        /* G */
+                            
+                        __m128d g_tis_l_01 = _mm_load_pd(tis[lftIdx][k][2]);
+                        __m128d g_tis_l_23 = _mm_load_pd(tis[lftIdx][k][2]+2);
+                        
+                        __m128d g_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][2]);
+                        __m128d g_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][2]+2);
+                            
+                        __m128d g_tis_a_01 = _mm_load_pd(tis[   idx][k][2]);
+                        __m128d g_tis_a_23 = _mm_load_pd(tis[   idx][k][2]+2);
+                            
+                        __m128d g_l_p01 = _mm_mul_pd(clL_01,g_tis_l_01);
+                        __m128d g_l_p23 = _mm_mul_pd(clL_23,g_tis_l_23);
+                            
+                        __m128d g_r_p01 = _mm_mul_pd(clR_01,g_tis_r_01);
+                        __m128d g_r_p23 = _mm_mul_pd(clR_23,g_tis_r_23);
+                            
+                        __m128d g_a_p01 = _mm_mul_pd(clA_01,g_tis_a_01);
+                        __m128d g_a_p23 = _mm_mul_pd(clA_23,g_tis_a_23);
+                            
+                        __m128d g_sum_L = _mm_hadd_pd(g_l_p01,g_l_p23);
+                        __m128d g_sum_R = _mm_hadd_pd(g_r_p01,g_r_p23);
+                        __m128d g_sum_A = _mm_hadd_pd(g_a_p01,g_a_p23);
+                            
+                        /* T */
+                            
+                        __m128d t_tis_l_01 = _mm_load_pd(tis[lftIdx][k][3]);
+                        __m128d t_tis_l_23 = _mm_load_pd(tis[lftIdx][k][3]+2);
+                            
+                        __m128d t_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][3]);
+                        __m128d t_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][3]+2);
+                            
+                        __m128d t_tis_a_01 = _mm_load_pd(tis[   idx][k][3]);
+                        __m128d t_tis_a_23 = _mm_load_pd(tis[   idx][k][3]+2);
+                            
+                        __m128d t_l_p01 = _mm_mul_pd(clL_01,t_tis_l_01);
+                        __m128d t_l_p23 = _mm_mul_pd(clL_23,t_tis_l_23);
+                            
+                        __m128d t_r_p01 = _mm_mul_pd(clR_01,t_tis_r_01);
+                        __m128d t_r_p23 = _mm_mul_pd(clR_23,t_tis_r_23);
+                            
+                        __m128d t_a_p01 = _mm_mul_pd(clA_01,t_tis_a_01);
+                        __m128d t_a_p23 = _mm_mul_pd(clA_23,t_tis_a_23);
+                            
+                        __m128d t_sum_L = _mm_hadd_pd(t_l_p01,t_l_p23);
+                        __m128d t_sum_R = _mm_hadd_pd(t_r_p01,t_r_p23);
+                        __m128d t_sum_A = _mm_hadd_pd(t_a_p01,t_a_p23);
+                            
+                            
+                        // now put it all together
+
+                        __m128d ac_sum_L = _mm_hadd_pd(a_sum_L,c_sum_L);
+                        __m128d ac_sum_R = _mm_hadd_pd(a_sum_R,c_sum_R);
+                        __m128d ac_sum_A = _mm_hadd_pd(a_sum_A,c_sum_A);
+                        __m128d gt_sum_L = _mm_hadd_pd(g_sum_L,t_sum_L);
+                        __m128d gt_sum_R = _mm_hadd_pd(g_sum_R,t_sum_R);
+                        __m128d gt_sum_A = _mm_hadd_pd(g_sum_A,t_sum_A);
+                            
+                            
+                        __m128d ac_prod_LR = _mm_mul_pd(ac_sum_L,ac_sum_R);
+                        __m128d gt_prod_LR = _mm_mul_pd(gt_sum_L,gt_sum_R);
+                            
+                        __m128d ac = _mm_mul_pd(ac_prod_LR,ac_sum_A);
+                        __m128d gt = _mm_mul_pd(gt_prod_LR,gt_sum_A);
+
+                        _mm_store_pd(clP,ac);
+                        _mm_store_pd(clP+2,gt);
+                            
+                        clP += 4;
+                        clL += 4;
+                        clR += 4;
+                        clA += 4;
+                    }
+                }
+            }
 			else
-				{
+            {
 				/* two-way split */
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
@@ -160,31 +464,113 @@ double Chunk::lnLikelihood(bool storeScore) {
 				double *clL = getClsForNode(lftIdx);
 				double *clR = getClsForNode(rhtIdx);
 				double *clP = getClsForNode(idx   );
-				for (int c=0; c<numSites; c++)
-					{
+				for (int c=0; c<numPatterns; c++)
+                {
 					for (int k=0; k<numGammaCats; k++)
-						{
-						for (int i=0; i<4; i++)
-							{
-							double sumL = 0.0, sumR = 0.0;
-							for (int j=0; j<4; j++)
-								{
-								sumL += clL[j] * tis[lftIdx][k][i][j];
-								sumR += clR[j] * tis[rhtIdx][k][i][j];
-								}
-							clP[i] = sumL * sumR;
-							}
-						clP += 4;
-						clL += 4;
-						clR += 4;
-						}
-					}
-				}
+                    {
+                            
+                        __m128d clL_01 = _mm_load_pd(clL);
+                        __m128d clL_23 = _mm_load_pd(clL+2);
+                        
+                        __m128d clR_01 = _mm_load_pd(clR);
+                        __m128d clR_23 = _mm_load_pd(clR+2);
+                        
+                        /* A */
+                            
+                        __m128d a_tis_l_01 = _mm_load_pd(tis[lftIdx][k][0]);
+                        __m128d a_tis_l_23 = _mm_load_pd(tis[lftIdx][k][0]+2);
+                            
+                        __m128d a_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][0]);
+                        __m128d a_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][0]+2);
+                            
+                        __m128d a_l_p01 = _mm_mul_pd(clL_01,a_tis_l_01);
+                        __m128d a_l_p23 = _mm_mul_pd(clL_23,a_tis_l_23);
+                            
+                        __m128d a_r_p01 = _mm_mul_pd(clR_01,a_tis_r_01);
+                        __m128d a_r_p23 = _mm_mul_pd(clR_23,a_tis_r_23);
+                            
+                        __m128d a_sum_L = _mm_hadd_pd(a_l_p01,a_l_p23);
+                        __m128d a_sum_R = _mm_hadd_pd(a_r_p01,a_r_p23);
+                            
+                        /* C */
+                            
+                        __m128d c_tis_l_01 = _mm_load_pd(tis[lftIdx][k][1]);
+                        __m128d c_tis_l_23 = _mm_load_pd(tis[lftIdx][k][1]+2);
+                            
+                        __m128d c_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][1]);
+                        __m128d c_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][1]+2);
+                            
+                        __m128d c_l_p01 = _mm_mul_pd(clL_01,c_tis_l_01);
+                        __m128d c_l_p23 = _mm_mul_pd(clL_23,c_tis_l_23);
+                            
+                        __m128d c_r_p01 = _mm_mul_pd(clR_01,c_tis_r_01);
+                        __m128d c_r_p23 = _mm_mul_pd(clR_23,c_tis_r_23);
+                            
+                        __m128d c_sum_L = _mm_hadd_pd(c_l_p01,c_l_p23);
+                        __m128d c_sum_R = _mm_hadd_pd(c_r_p01,c_r_p23);
+                            
+                        /* G */
+                            
+                        __m128d g_tis_l_01 = _mm_load_pd(tis[lftIdx][k][2]);
+                        __m128d g_tis_l_23 = _mm_load_pd(tis[lftIdx][k][2]+2);
+                            
+                        __m128d g_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][2]);
+                        __m128d g_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][2]+2);
+                            
+                        __m128d g_l_p01 = _mm_mul_pd(clL_01,g_tis_l_01);
+                        __m128d g_l_p23 = _mm_mul_pd(clL_23,g_tis_l_23);
+                            
+                        __m128d g_r_p01 = _mm_mul_pd(clR_01,g_tis_r_01);
+                        __m128d g_r_p23 = _mm_mul_pd(clR_23,g_tis_r_23);
+                            
+                        __m128d g_sum_L = _mm_hadd_pd(g_l_p01,g_l_p23);
+                        __m128d g_sum_R = _mm_hadd_pd(g_r_p01,g_r_p23);
+                            
+                        /* T */
+                            
+                        __m128d t_tis_l_01 = _mm_load_pd(tis[lftIdx][k][3]);
+                        __m128d t_tis_l_23 = _mm_load_pd(tis[lftIdx][k][3]+2);
+                            
+                        __m128d t_tis_r_01 = _mm_load_pd(tis[rhtIdx][k][3]);
+                        __m128d t_tis_r_23 = _mm_load_pd(tis[rhtIdx][k][3]+2);
+                            
+                        __m128d t_l_p01 = _mm_mul_pd(clL_01,t_tis_l_01);
+                        __m128d t_l_p23 = _mm_mul_pd(clL_23,t_tis_l_23);
+                            
+                        __m128d t_r_p01 = _mm_mul_pd(clR_01,t_tis_r_01);
+                        __m128d t_r_p23 = _mm_mul_pd(clR_23,t_tis_r_23);
+                            
+                        __m128d t_sum_L = _mm_hadd_pd(t_l_p01,t_l_p23);
+                        __m128d t_sum_R = _mm_hadd_pd(t_r_p01,t_r_p23);
+                            
+                            
+                        // now put it all together
+                            
+                        __m128d ac_sum_L = _mm_hadd_pd(a_sum_L,c_sum_L);
+                        __m128d ac_sum_R = _mm_hadd_pd(a_sum_R,c_sum_R);
+                        __m128d gt_sum_L = _mm_hadd_pd(g_sum_L,t_sum_L);
+                        __m128d gt_sum_R = _mm_hadd_pd(g_sum_R,t_sum_R);
+                            
+                            
+                        __m128d ac = _mm_mul_pd(ac_sum_L,ac_sum_R);
+                        __m128d gt = _mm_mul_pd(gt_sum_L,gt_sum_R);
+                                                        
+                        _mm_store_pd(clP,ac);
+                        _mm_store_pd(clP+2,gt);
+                            
+                        clP += 4;
+                        clL += 4;
+                        clR += 4;
+                        
+                    }
+                }
+            }
+            
 				
 			/* scale */
 #			if 1
 			double *clP = getClsForNode( p->getIndex() );
-			for (int c=0; c<numSites; c++)
+			for (int c=0; c<numPatterns; c++)
 				{
 				double maxVal = 0.0;
 				for (int i=0; i<stride; i++)
@@ -209,7 +595,7 @@ double Chunk::lnLikelihood(bool storeScore) {
 	double catProb = 1.0 / numGammaCats;
 	double *clP = getClsForNode( p->getIndex() );
 	double lnL = 0.0;
-	for (int c=0; c<numSites; c++)
+	for (int c=0; c<numPatterns; c++)
 		{
 		double like = 0.0;
 		for (int k=0; k<numGammaCats; k++)
@@ -218,12 +604,14 @@ double Chunk::lnLikelihood(bool storeScore) {
 				like += clP[i] * f[i] * catProb;
 			clP += 4;
 			}
-		lnL += log( like ) + lnScaler[c];
+		lnL += (log( like ) + lnScaler[c]) * patternCounts[c];
 		}
 		
 	delete [] lnScaler;
 	
-    //std::cout << "lnL[" << subsetId << "] = " << lnL << std::endl;
+//    std::cerr << "lnL[" << subsetId << "] = " << lnL << std::endl;
+//    std::exit(123);
+
     
     if (storeScore == true)
         storedLnL = lnL;
@@ -231,6 +619,104 @@ double Chunk::lnLikelihood(bool storeScore) {
     mostRecentLnL = lnL;
     
 	return lnL;
+}
+
+
+/*-------------------------------------------------------------------
+ |
+ |   GetPossibleNucs:
+ |
+ |   This function initializes a vector, nuc[MAX_NUM_STATES]. The four elements
+ |   of nuc correspond to the four nucleotides in alphabetical order.
+ |   We are assuming that the nucCode is a binary representation of
+ |   the nucleotides that are consistent with the observation. For
+ |   example, if we observe an A, then the nucCode is 1 and the
+ |   function initalizes nuc[0] = 1 and the other elements of nuc
+ |   to be 0.
+ |
+ |   Observation    nucCode        nuc
+ |        A            1           1000
+ |        C            2           0100
+ |        G            4           0010
+ |        T            8           0001
+ |        R            5           1010
+ |        Y           10           0101
+ |        M            3           1100
+ |        K           12           0011
+ |        S            6           0110
+ |        W            9           1001
+ |        H           11           1101
+ |        B           14           0111
+ |        V            7           1110
+ |        D           13           1011
+ |        N - ?       15           1111
+ |
+ -------------------------------------------------------------------*/
+std::string Chunk::nucAsStringValue(int nucCode)
+{
+    std::string nucString = "-";
+    if (nucCode == 1)
+    {
+        nucString = "A";
+    }
+    else if (nucCode == 2)
+    {
+        nucString = "C";
+    }
+    else if (nucCode == 3)
+    {
+        nucString = "M";
+    }
+    else if (nucCode == 4)
+    {
+        nucString = "G";
+    }
+    else if (nucCode == 5)
+    {
+        nucString = "R";
+    }
+    else if (nucCode == 6)
+    {
+        nucString = "S";
+    }
+    else if (nucCode == 7)
+    {
+        nucString = "V";
+    }
+    else if (nucCode == 8)
+    {
+        nucString = "T";
+    }
+    else if (nucCode == 9)
+    {
+        nucString = "W";
+    }
+    else if (nucCode == 10)
+    {
+        nucString = "Y";
+    }
+    else if (nucCode == 11)
+    {
+        nucString = "H";
+    }
+    else if (nucCode == 12)
+    {
+        nucString = "K";
+    }
+    else if (nucCode == 13)
+    {
+        nucString = "D";
+    }
+    else if (nucCode == 14)
+    {
+        nucString = "B";
+    }
+    else if (nucCode == 15)
+    {
+        nucString = "-";
+    }
+    
+    return nucString;
 }
 
 void Chunk::printTis(void) {

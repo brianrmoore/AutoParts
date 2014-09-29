@@ -2,7 +2,6 @@
 #define Chunk_H
 
 #include <set>
-#include <vector>
 #include "MbMatrix.h"
 
 class Alignment;
@@ -25,10 +24,6 @@ class Chunk {
 					 void   updateTransitionProbabilities(void);
 
 	private:
-                     void   compress(void);
-                     bool   isAmbiguous(int nc);
-              std::string   nucAsStringValue(int nc);
-    
 	                 void   printTipCls(void);
                      void   printTis(void);
 				Settings*   settingsPtr;
@@ -46,11 +41,6 @@ class Chunk {
                    double   storedLnL;
                    double   mostRecentLnL;
                      bool   update;
-                     bool   usingAmbiguousCharacters;
-    std::vector<std::vector<size_t> > charMatrix;
-    std::vector<std::vector<bool> >   gapMatrix;
-                      int   numPatterns;
-      std::vector<size_t>   patternCounts;
 };
 
 
