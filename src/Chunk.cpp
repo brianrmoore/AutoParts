@@ -20,9 +20,21 @@
 #include <pmmintrin.h>
 
 
+#ifdef AP_MPI
+#include <mpi.h>
+#endif
+
+
 
 Chunk::Chunk(Alignment* ap, Settings* sp, Model* mp, int si) {
 
+    pid = 0;
+    numProcesses = 1;
+#ifdef AP_MPI
+    pid = MPI::COMM_WORLD.Get_rank();
+    numProcesses = MPI::COMM_WORLD.Get_size ();
+#endif
+    
 	// remember the location of important objects
 	alignmentPtr = ap;
 	modelPtr     = mp;
@@ -130,7 +142,6 @@ void Chunk::compress( void )
 {
     bool doCompression = true;
     bool treatAmbiguousAsGaps = false;
-//    bool treatUnknownAsGap = true;
     
     charMatrix.clear();
     gapMatrix.clear();
@@ -294,13 +305,17 @@ double Chunk::lnLikelihood(bool storeScore) {
 	// get some variables that are used over-and-over again
 	int stride = 4 * numGammaCats;
 	Tree* treePtr = modelPtr->findTree(subsetId);
+    size_t pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
+    size_t pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
 		
 	/* pass down tree, filling in conditional likelihoods using the sum-product algorithm
 	   (Felsenstein pruning algorithm) */
 	double *lnScaler = new double[numPatterns];
 	for (int i=0; i<numPatterns; i++)
+    {
 		lnScaler[i] = 0.0;
-		
+    }
+    
     
 	for (int n=0; n<treePtr->getNumNodes(); n++)
     {
@@ -314,11 +329,11 @@ double Chunk::lnLikelihood(bool storeScore) {
 				int rhtIdx = p->getRht()->getIndex();
 				int ancIdx = p->getAnc()->getIndex();
 				int idx    = p->getIndex();
-				double *clL = getClsForNode(lftIdx);
-				double *clR = getClsForNode(rhtIdx);
-				double *clA = getClsForNode(ancIdx);
-				double *clP = getClsForNode(idx   );
-				for (int c=0; c<numPatterns; c++)
+				double *clL = getClsForNode(lftIdx) + pattern_block_start*stride;
+				double *clR = getClsForNode(rhtIdx) + pattern_block_start*stride;
+				double *clA = getClsForNode(ancIdx) + pattern_block_start*stride;
+				double *clP = getClsForNode(idx   ) + pattern_block_start*stride;
+				for (size_t c=pattern_block_start; c<pattern_block_end; c++)
                 {
 					for (int k=0; k<numGammaCats; k++)
                     {
@@ -461,10 +476,10 @@ double Chunk::lnLikelihood(bool storeScore) {
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
 				int idx    = p->getIndex();
-				double *clL = getClsForNode(lftIdx);
-				double *clR = getClsForNode(rhtIdx);
-				double *clP = getClsForNode(idx   );
-				for (int c=0; c<numPatterns; c++)
+				double *clL = getClsForNode(lftIdx) + pattern_block_start*stride;
+				double *clR = getClsForNode(rhtIdx) + pattern_block_start*stride;
+                double *clP = getClsForNode(idx   ) + pattern_block_start*stride;
+                for (size_t c=pattern_block_start; c<pattern_block_end; c++)
                 {
 					for (int k=0; k<numGammaCats; k++)
                     {
@@ -569,48 +584,97 @@ double Chunk::lnLikelihood(bool storeScore) {
 				
 			/* scale */
 #			if 1
-			double *clP = getClsForNode( p->getIndex() );
-			for (int c=0; c<numPatterns; c++)
-				{
+            double *clP = getClsForNode( p->getIndex() ) + pattern_block_start*stride;
+            for (size_t c=pattern_block_start; c<pattern_block_end; c++)
+            {
 				double maxVal = 0.0;
 				for (int i=0; i<stride; i++)
-					{
+                {
 					if (clP[i] > maxVal)
+                    {
 						maxVal = clP[i];
-					}
+                    }
+                }
 				double scaler = 1.0 / maxVal;
 				for (int i=0; i<stride; i++)
+                {
 					clP[i] *= scaler;
+                }
 				lnScaler[c] += log(maxVal);
 				clP += stride;
-				}
+            }
 #			endif
 						
-			}
-		}
+        }
+    }
 		
 	/* calculate likelihood */
 	Node *p = treePtr->getRoot()->getLft();
 	std::vector<double> f = modelPtr->findBaseFreqs(subsetId)->getFreq();
 	double catProb = 1.0 / numGammaCats;
-	double *clP = getClsForNode( p->getIndex() );
-	double lnL = 0.0;
-	for (int c=0; c<numPatterns; c++)
-		{
+	double *clP = getClsForNode( p->getIndex() ) + pattern_block_start*stride;
+    double lnL = 0.0;
+    for (size_t c=pattern_block_start; c<pattern_block_end; c++)
+    {
 		double like = 0.0;
 		for (int k=0; k<numGammaCats; k++)
-			{
+        {
 			for (int i=0; i<4; i++)
+            {
 				like += clP[i] * f[i] * catProb;
-			clP += 4;
-			}
-		lnL += (log( like ) + lnScaler[c]) * patternCounts[c];
-		}
+            }
+            clP += 4;
+        }
+        lnL += (log( like ) + lnScaler[c]) * patternCounts[c];
+    }
 		
-	delete [] lnScaler;
+    delete [] lnScaler;
+    
+#ifdef AP_MPI
+//    std::cerr << "Before: lnL[pid=" << pid << "] = " << lnL << std::endl;
+    
+    MPI::COMM_WORLD.Barrier();
+    
+    if ( pid != 0 )
+    {
+        // send from the workers the log-likelihood to the master
+        MPI::COMM_WORLD.Send(&lnL, 1, MPI::DOUBLE, 0, 0);
+    }
+    
+    if ( pid == 0 )
+    {
+        for (size_t i=1; i<numProcesses; ++i)
+        {
+            double tmp = 0;
+            MPI::COMM_WORLD.Recv(&tmp, 1, MPI::DOUBLE, (int)i, 0);
+            lnL += tmp;
+        }
+    }
+    
+    MPI::COMM_WORLD.Barrier();
+    
+//    MPI::COMM_WORLD.Bcast(&lnL, 1, MPI::DOUBLE, 0);
+    
+    if ( pid == 0 )
+    {
+        for (size_t i=1; i<numProcesses; ++i)
+        {
+            MPI::COMM_WORLD.Send(&lnL, 1, MPI::DOUBLE, (int)i, 0);
+        }
+    }
+    else
+    {
+        MPI::COMM_WORLD.Recv(&lnL, 1, MPI::DOUBLE, 0, 0);
+    }
+    
+    MPI::COMM_WORLD.Barrier();
+//    std::cerr << "After: lnL[pid=" << pid << "] = " << lnL << std::endl;
+
+#endif
 	
 //    std::cerr << "lnL[" << subsetId << "] = " << lnL << std::endl;
-//    std::exit(123);
+//    std::cerr << "\nExpected:\n" << "lnL[" << subsetId << "] = " << -1490.98 << std::endl;
+//    std::exit(0);
 
     
     if (storeScore == true)
