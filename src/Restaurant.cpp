@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+
 #include "Chunk.h"
 #include "DualStream.h"
 #include "MbRandom.h"
@@ -60,7 +61,7 @@ Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, Dua
 	if (probUpdateSeating < 0.0000001)
 		{
 		Table* tbl = new Table( ranPtr, settingsPtr, alignmentPtr, modelPtr, outLog, parmId );
-		tables.insert( tbl );
+		tables.push_back( tbl );
 		for (int i=0; i<numPatrons; i++)
 			tbl->seatPatron( i );
 		}
@@ -73,7 +74,7 @@ Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, Dua
 			if (u < newTableProb)
 				{
 				Table* tbl = new Table( ranPtr, settingsPtr, alignmentPtr, modelPtr, outLog, parmId );
-				tables.insert( tbl );
+				tables.push_back( tbl );
 				tbl->seatPatron( i );
 				}
 			else 
@@ -116,12 +117,15 @@ Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, Dua
 	// allocate the RGF
 	rgf = new int[numPatrons];
 	
+#if 0
 	print();
+#endif
+    
 }
 
 Restaurant::~Restaurant(void) {
 
-	for (std::set<Table *>::iterator p=tables.begin(); p != tables.end(); p++)
+	for (std::vector<Table *>::iterator p=tables.begin(); p != tables.end(); p++)
 		delete (*p);
 	delete [] rgf;
 	parmOut.close();
@@ -136,6 +140,13 @@ double Restaurant::acceptanceProb(double lnR) {
 	else
 		return exp( lnR );
 }
+
+//void Restaurant::addPartition(void) {
+//    
+//    setRgf();
+//    Partition* aPartition = new Partition(numPatrons, rgf);
+//    sampledPartitions.push_back( aPartition );
+//}
 
 double Restaurant::calcAlphaFromEt(double expT) {
 
@@ -179,7 +190,7 @@ bool Restaurant::change(void) {
 
 	bool wasAccepted = false;
 	double u = ranPtr->uniformRv();
-	if (u < probUpdateSeating)
+	if (u < probUpdateSeating )
 		{
 		for (int i=0; i<numPatrons; i++)
 			updateSeating(i);
@@ -233,7 +244,7 @@ bool Restaurant::changeParmOnTable(Table* tbl) {
 void Restaurant::deleteUnoccupiedTables(void) {
 
 	std::vector<Table*> tablesToDelete;
-	for (std::set<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
+	for (std::vector<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
 		{
 		if ( (*p)->numPatronsAtTable() == 0 )
 			tablesToDelete.push_back( (*p) );
@@ -253,7 +264,7 @@ double Restaurant::expNumTables(double a) {
 
 Table* Restaurant::getTableWithPatron(int patron) {
 
-	for (std::set<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
+	for (std::vector<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
 		{
 		if ( (*p)->isPatronAtTable(patron) == true )
 			return (*p);
@@ -261,7 +272,7 @@ Table* Restaurant::getTableWithPatron(int patron) {
 	return NULL;
 }
 
-void Restaurant::normalizeLogProbabilitiesInMap(std::map<Table*,double>& m) {
+void Restaurant::normalizeLogProbabilitiesInMap(std::map<size_t,double>& m) {
 
 #	if defined(DEBUG_NORMALIZE)
 	int i = 0;
@@ -270,15 +281,15 @@ void Restaurant::normalizeLogProbabilitiesInMap(std::map<Table*,double>& m) {
 #	endif
 
 	// set up an iterator for the map
-	std::map<Table*,double>::iterator p = m.begin();
+	std::map<size_t,double>::iterator p = m.begin();
 	
 	// find the largest value in the set of log probabilities
 	double lnC = p->second;
 	for (p = m.begin(); p != m.end(); p++)
-		{
+    {
 		if (p->second > lnC)
 			lnC = p->second;
-		}
+    }
 	
 	// pull the log factor lnC out of every log probability in the set
 	for (p = m.begin(); p != m.end(); p++)
@@ -311,12 +322,12 @@ Table* Restaurant::pickTableAtRandomFromPrior(void) {
 
 	// get the number of patrons currently seated at all of the tables
 	int n = 0;
-	for (std::set<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
+	for (std::vector<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
 		n += (*p)->numPatronsAtTable();
 		
 	double u = ranPtr->uniformRv();
 	double sum = 0.0;
-	for (std::set<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
+	for (std::vector<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
 		{
 		sum += (double)((*p)->numPatronsAtTable()) / n;
 		if (u < sum)
@@ -329,7 +340,10 @@ Table* Restaurant::pickTableUniformlyAtRandom(void) {
 
 	int whichTable = (int)(ranPtr->uniformRv() * tables.size());
 	int i = 0;
-	for (std::set<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
+    
+//    We cannot use sets of pointers because these will have different orders depending on the process
+	
+    for (std::vector<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
 		{
 		if (i == whichTable)
 			return (*p);
@@ -341,7 +355,7 @@ Table* Restaurant::pickTableUniformlyAtRandom(void) {
 void Restaurant::print(void) {
 
 	int i = 0;
-	for (std::set<Table*>::iterator p=tables.begin(); p != tables.end(); p++)
+	for (std::vector<Table*>::iterator p=tables.begin(); p != tables.end(); p++)
 		{
 		(*outLog) << "Table " << ++i << '\n';
 		(*p)->print();
@@ -350,8 +364,22 @@ void Restaurant::print(void) {
 
 void Restaurant::removeTable(Table* tbl) {
 
-	tables.erase( tbl );
-	delete tbl;
+    
+    int i = 0;
+    for (std::vector<Table*>::iterator p=tables.begin(); p != tables.end(); p++)
+    {
+        if ( *p == tbl )
+        {
+            break;
+        }
+        ++i;
+    }
+    
+    if ( i < tables.size() )
+    {
+        tables.erase(tables.begin()+i);
+        delete tbl;
+    }
 }
 
 double Restaurant::sampleAlpha(int k, int n, double oldAlpha, double a, double b) {
@@ -435,6 +463,177 @@ void Restaurant::setRgf(void) {
 		}
 }
 
+//void Restaurant::simulateFromPrior(std::vector<int>& x, int nReps) {
+//    
+//    x.resize(numPatrons);
+//    for (int i=0; i<x.size(); i++)
+//    x[i] = 0;
+//    for (int i=0; i<nReps; i++)
+//    {
+//        double a = alpha;
+//        if (settingsPtr->getIsConcFixed() == false)
+//        a = ranPtr->gammaRv(gammaAlpha, gammaBeta);
+//        int nt = 0;
+//        for (int j=0; j<numPatrons; j++)
+//        {
+//            double pNew = a / (j + a);
+//            double u = ranPtr->uniformRv();
+//            if (u < pNew)
+//            nt++;
+//        }
+//        x[nt-1]++;
+//    }
+//#	if 0
+//    for (int i=0; i<numPatrons; i++)
+//    std::cout << std::setw(4) << i << "  " << x[i] << std::endl;
+//#	endif
+//}
+//
+//void Restaurant::summarizePartitions(void) {
+//    
+//    // print the restaurant name
+//    std::cout << "Restaurant: " << getName() << std::endl;
+//    // first, calculate the mean partition
+//    Partition avePart(sampledPartitions);
+//    std::cout << "   Average Partition = ";
+//    avePart.print();
+//    
+//    // get the list of unique partitions
+//    vector<int> numOfThisPart;
+//    vector<Partition*> uniqueParts;
+//    vector<int> indices;
+//    int j = 0;
+//    for (vector<Partition*>::iterator p=sampledPartitions.begin(); p != sampledPartitions.end(); p++)
+//    {
+//        bool foundPart = false;
+//        int i = 0;
+//        for (vector<Partition*>::iterator q=uniqueParts.begin(); q != uniqueParts.end(); q++)
+//        {
+//            if ( (**p) == (**q) )
+//            {
+//                foundPart = true;
+//                break;
+//            }
+//            i++;
+//        }
+//        if ( foundPart == false )
+//        {
+//            uniqueParts.push_back( new Partition(**p) );
+//            numOfThisPart.push_back( 1 );
+//            indices.push_back( j++ );
+//        }
+//        else
+//        {
+//            numOfThisPart[i]++;
+//        }
+//    }
+//    mySort( numOfThisPart, indices, numOfThisPart.size() );
+//    
+//    std::cout << "   Unique partitions:" << endl;
+//    double cumulative = 0.0;
+//    for (int i=0; i<uniqueParts.size(); i++)
+//    {
+//        double prob = (double)numOfThisPart[i] / sampledPartitions.size();
+//        cumulative += prob;
+//        std::cout << "   " << std::setw(5) << i + 1 << " -- " << setw(5) << numOfThisPart[i] << " " << fixed << setprecision(4) << prob << " " << cumulative << " ";
+//        uniqueParts[ indices[i] ]->print();
+//    }
+//    
+//    // calculate the probability distribution for the number of sampled tables
+//    std::vector<int> px;
+//    int nReps = 10000;
+//    simulateFromPrior(px, nReps);
+//    
+//    std::cout << "   Posterior and prior probability distributions for the number of tables:" << std::endl;
+//    std::vector<int> pp(numPatrons+1, 0);
+//    int largestDegree = 0, n = 0;
+//    for (std::vector<Partition *>::iterator p=sampledPartitions.begin(); p != sampledPartitions.end(); p++)
+//    {
+//        pp[ (*p)->getDegree() ]++;
+//        if ( (*p)->getDegree() > largestDegree )
+//        largestDegree = (*p)->getDegree();
+//        n++;
+//    }
+//    for (int i=1; i<=numPatrons; i++)
+//    std::cout << "   " << std::setw(5) << i << " -- " << std::setw(5) << pp[i] << " " << std::fixed << std::setprecision(4) << (double)pp[i] / n << " " << std::fixed << std::setprecision(4) << (double)px[i-1] / nReps << std::endl;
+//    
+//    // calculate the probability that patrons are grouped together at the same table
+//    int** togetherness = new int*[numPatrons];
+//    togetherness[0] = new int[numPatrons*numPatrons];
+//    for (int i=1; i<numPatrons; i++)
+//    togetherness[i] = togetherness[i-1] + numPatrons;
+//    for (int i=0; i<numPatrons; i++)
+//    for (int j=0; j<numPatrons; j++)
+//    togetherness[i][j] = 0;
+//    
+//    for (std::vector<Partition *>::iterator p=sampledPartitions.begin(); p != sampledPartitions.end(); p++)
+//    {
+//        for (int i=0; i<numPatrons; i++)
+//        {
+//            for (int j=i+1; j<numPatrons; j++)
+//            {
+//                if ( (*p)->getElement(i) == (*p)->getElement(j) )
+//                togetherness[i][j]++;
+//            }
+//        }
+//    }
+//    
+//    std::cout << "   Probability that patrons are seated at the same table:" << std::endl;
+//    for (int i=0; i<numPatrons; i++)
+//    {
+//        for (int j=i+1; j<numPatrons; j++)
+//        {
+//            std::cout << "   " << std::setw(4) << i+1 << " " << std::setw(4) << j+1 << " -- " << std::fixed << std::setprecision(4) << (double)togetherness[i][j] / sampledPartitions.size() << std::endl;
+//        }
+//    }
+//    
+//    delete [] togetherness[0];
+//    delete [] togetherness;
+//}
+//
+//void Restaurant::mySort(std::vector<int> &item, std::vector<int> &assoc, int count) {
+//    
+//    sort2(item, assoc, 0, count-1);
+//}
+//
+//void Restaurant::sort2(std::vector<int> &item, std::vector<int> &assoc, int left, int right) {
+//    
+//    int i = left;
+//    int j = right;
+//    int x = item[(left+right)/2];
+//    do 
+//    {
+//        /*while (item[i] < x && i < right)
+//         i++;
+//         while (x < item[j] && j > left)
+//         j--;*/
+//        
+//        while (item[i] > x && i < right)
+//        i++;
+//        while (x > item[j] && j > left)
+//        j--;
+//        
+//        if (i <= j)
+//        {
+//            int y = item[i];
+//            item[i] = item[j];
+//            item[j] = y;
+//            
+//            int temp = assoc[i];
+//            assoc[i] = assoc[j];
+//            assoc[j] = temp;
+//            
+//            i++;
+//            j--;
+//        }
+//    } while (i <= j);
+//    if (left < j)
+//    sort2 (item, assoc, left, j);
+//    if (i < right)
+//    sort2 (item, assoc, i, right);
+//    
+//}
+
 void Restaurant::updateSeating(int patron) {
 
 	// remove patron from its current table 
@@ -447,28 +646,28 @@ void Restaurant::updateSeating(int patron) {
 	for (int i=0; i<numAuxTables; i++)
 		{
 		Table* tbl = new Table(ranPtr, settingsPtr, alignmentPtr, modelPtr, outLog, parmId);
-		tables.insert( tbl ); 
+		tables.push_back( tbl );
 		}
 
-	// make a map that contains as the key a pointer to the table and as the value the probability of seating the patron at that table
-	std::map<Table*,double> probs, lnLikes;
-	for (std::set<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
-		probs.insert( std::make_pair((*p),0.0) );
+	// make a map that contains as the key the index to the table and as the value the probability of seating the patron at that table
+	std::map<size_t,double> probs, lnLikes;
+	for (size_t i=0; i < tables.size(); ++i)
+		probs.insert( std::make_pair(i,0.0) );
 		
 	// calculate the log probability (up to a constant) of seating the patron at each of the possible tables 
-	for (std::map<Table*,double>::iterator p = probs.begin(); p != probs.end(); p++)
-		{
-		Table* tbl = p->first;                               // get a pointer to the table
+	for (std::map<size_t,double>::iterator p = probs.begin(); p != probs.end(); p++)
+    {
+		Table* tbl = tables[p->first];                               // get a pointer to the table
 		tbl->seatPatron(patron);                             // seat the patron at the i-th existing table
 		double lnLPart = modelPtr->lnLikelihood(patron, false);   // calculate the likelihood when the patron is seated at the i-th table
         p->second = lnLPart;
-        lnLikes.insert( std::make_pair(tbl,lnLPart) );
+        lnLikes.insert( std::make_pair(p->first,lnLPart) );
 		if (tbl->numPatronsAtTable() == 1)
 			p->second += log(alpha / numAuxTables);
 		else 
 			p->second += log( tbl->numPatronsAtTable() - 1 );
 		tbl->removePatron( patron );
-		}
+    }
 
 	// calculate the probabilities of reseating the element at each of the tables, and pick a table to reseat the element at
 	normalizeLogProbabilitiesInMap(probs);
@@ -477,19 +676,21 @@ void Restaurant::updateSeating(int patron) {
 	double u = ranPtr->uniformRv();
 	double sum = 0.0;
     Table* newTable = NULL;
-	for (std::map<Table*,double>::iterator p = probs.begin(); p != probs.end(); p++)
-		{
+    size_t newTableIndex = 0;
+	for (std::map<size_t,double>::iterator p = probs.begin(); p != probs.end(); p++)
+    {
 		sum += p->second;
 		if (u < sum)
-			{
-			p->first->seatPatron(patron);
-            newTable = p->first;
+        {
+			tables[p->first]->seatPatron(patron);
+            newTable = tables[p->first];
+            newTableIndex = p->first;
 			break;
 			}
 		}
 	
 	// update the likelihood for that element
-    std::map<Table*,double>::iterator it = lnLikes.find(newTable);
+    std::map<size_t,double>::iterator it = lnLikes.find(newTableIndex);
     if (it != lnLikes.end())
         modelPtr->getChunk(patron)->setStoredLnL(it->second);
     else 

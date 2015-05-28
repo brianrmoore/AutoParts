@@ -16,11 +16,15 @@ class Mcmc {
                 	              
 	private:
 	                       void   saveStates(int n, double lnL);
-						 Model*   modelPtr;
+
+    
+                         Model*   modelPtr;
 					  Settings*   settingsPtr;
 					  MbRandom*   ranPtr;
 				  std::ofstream   lnOut;
-                            
+    
+                         size_t   pid;
+    
 };
 
 #endif

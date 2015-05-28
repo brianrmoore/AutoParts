@@ -33,13 +33,13 @@ class Restaurant {
 				   double   calcAlphaFromEt(double expT);
 				     void   deleteUnoccupiedTables(void);
 				   double   expNumTables(double a);
-				     void   normalizeLogProbabilitiesInMap(std::map<Table*,double>& m);
+				     void   normalizeLogProbabilitiesInMap(std::map<size_t,double>& m);
 				   Table*   pickTableAtRandomFromPrior(void);
 				   Table*   pickTableUniformlyAtRandom(void);
 				     void   removeTable(Table* tbl);
 				   double   sampleAlpha(int k, int n, double oldAlpha, double a, double b);
 					 void   setRgf(void);
-		 std::set<Table*>   tables;
+      std::vector<Table*>   tables;
 			   Alignment*   alignmentPtr;
 				MbRandom*   ranPtr;
 				   Model*   modelPtr;

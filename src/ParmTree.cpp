@@ -502,7 +502,7 @@ double Tree::update(void) {
 	double lnP = 0.0;
 	if (isTreeFixed == false)
 		{
-		if (ranPtr->uniformRv() < 0.1)
+		if (ranPtr->uniformRv() < 0.1 )
 			lnP = updateLocal();
 		else
 			lnP = updateTbr();
