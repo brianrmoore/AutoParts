@@ -34,6 +34,7 @@ class Settings {
 	                 void   printUsage(void);
 				   double   brlenLambda;
 				      int   chainLength;
+                      int   burninLength;
 			  std::string   dataFilePathName;
 				      int   numGammaCats;
 			  std::string   outPutFileName;

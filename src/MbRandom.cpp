@@ -1204,7 +1204,8 @@ double MbRandom::incompleteGamma (double x, double alpha, double LnGamma_alpha) 
  */
 void MbRandom::setSeed(void) {
 
-	seedType x = (seedType)( time( 0 ) );
+//    seedType x = (seedType)( time( 0 ) );
+    seedType x = (seedType)( 12345 );
 	I1 = x & 0xFFFF;
 	I2 = x >> 16;
 }

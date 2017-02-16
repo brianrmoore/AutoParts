@@ -7,7 +7,7 @@
 
 Settings::Settings(int argc, char *argv[]) {
 
-#	if 1
+#	if 0
 	/* set up fake command-line argument string */
 	char *cmdString[28];
 	cmdString[ 0] = (char*)"ck";
@@ -41,7 +41,7 @@ Settings::Settings(int argc, char *argv[]) {
 	argv = cmdString;
 #	endif
 
-	enum Mode { DATA_FILE, TREE_FILE, OUTPUT_FILE, LOG_FILE, CHAIN_LENGTH, PRINT_FREQ, SAMPLE_FREQ, BRLEN_PARM, NUM_GAMMA_CATS, ASRV_LAMBDA, CONC_FIXED, EXP_CATS, CONC_MEAN, CONC_VAR, TUNE_T1, TUNE_T2, TUNE_T3, TUNE_T4, TUNE_T5, NONE };
+	enum Mode { DATA_FILE, TREE_FILE, OUTPUT_FILE, LOG_FILE, CHAIN_LENGTH, BURNIN_LENGTH, PRINT_FREQ, SAMPLE_FREQ, BRLEN_PARM, NUM_GAMMA_CATS, ASRV_LAMBDA, CONC_FIXED, EXP_CATS, CONC_MEAN, CONC_VAR, TUNE_T1, TUNE_T2, TUNE_T3, TUNE_T4, TUNE_T5, NONE };
 
 	/* set default values for parameters */
 	dataFilePathName       = "";
@@ -89,7 +89,9 @@ Settings::Settings(int argc, char *argv[]) {
 				else if ( cmd == "-f" )
 					status = LOG_FILE;
 				else if ( cmd == "-l" )
-					status = CHAIN_LENGTH;
+                    status = CHAIN_LENGTH;
+                else if ( cmd == "-d" )
+                    status = BURNIN_LENGTH;
 				else if ( cmd == "-p" )
 					status = PRINT_FREQ;
 				else if ( cmd == "-s" )
@@ -136,7 +138,9 @@ Settings::Settings(int argc, char *argv[]) {
 				else if ( status == LOG_FILE )
 					logFileName = argv[i];
 				else if ( status == CHAIN_LENGTH )
-					chainLength = atoi(argv[i]);
+                    chainLength = atoi(argv[i]);
+                else if ( status == BURNIN_LENGTH )
+                    burninLength = atoi(argv[i]);
 				else if ( status == PRINT_FREQ )
 					printFrequency = atoi(argv[i]);
 				else if ( status == SAMPLE_FREQ )
@@ -208,7 +212,8 @@ void Settings::printUsage(void) {
 	std::cout << "   -t : Tree file name (for constraining the analysis to a fixed tree)" << std::endl;
 	std::cout << "   -o : Output file name" << std::endl;
 	std::cout << "   -f : File name for logging of screen output" << std::endl;
-	std::cout << "   -l : Number of MCMC cycles" << std::endl;
+    std::cout << "   -l : Number of MCMC cycles" << std::endl;
+    std::cout << "   -d : Number of MCMC cycles to discard as the \"burn-in\"" << std::endl;
 	std::cout << "   -p : Print frequency" << std::endl;
 	std::cout << "   -s : Sample frequency" << std::endl;
 	std::cout << "   -b : Exponential parameter for branch lengths" << std::endl;
@@ -225,7 +230,7 @@ void Settings::printUsage(void) {
 	std::cout << "  -t5 : MCMC tuning parameter for the tree length parameter" << std::endl;
 	std::cout << std::endl;
 	std::cout << "Example:" << std::endl;
-	std::cout << "   ./chunky -i <input file> -o <output file>" << std::endl;
+	std::cout << "   ./AutoParts -i <input file> -o <output file>" << std::endl;
 	exit(0);
 
 }

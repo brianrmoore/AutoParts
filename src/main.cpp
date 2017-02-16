@@ -7,11 +7,30 @@
 #include "Model.h"
 #include "Settings.h"
 
+
+#ifdef AP_MPI
+#include <mpi.h>
+#endif
+
 void printHeader(DualStream& log);
 
 
 
 int main (int argc, char* argv[]) {
+    
+    
+#   ifdef AP_MPI
+    try
+    {
+        MPI::Init(argc, argv);
+//        processId = MPI::COMM_WORLD.Get_rank();
+//        numProcesses = MPI::COMM_WORLD.Get_size ();
+    }
+    catch (char* str)
+    {
+        return -1;
+    }
+#   endif
     
 	// initialize
 	Settings mySettings(argc, argv);
@@ -36,6 +55,11 @@ int main (int argc, char* argv[]) {
 	Mcmc myMcmc( &mySettings, &myModel, &myRandom, log );
 
     logFstrm.close();
+    
+    
+#   ifdef AP_MPI
+    MPI::Finalize();
+#   endif
 
     return 0;
 }

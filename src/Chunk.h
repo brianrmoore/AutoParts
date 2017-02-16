@@ -31,7 +31,10 @@ class Chunk {
     
 	                 void   printTipCls(void);
                      void   printTis(void);
-				Settings*   settingsPtr;
+				
+                   size_t   pid;
+                   size_t   numProcesses;
+                Settings*   settingsPtr;
 			   Alignment*   alignmentPtr;
 			       Model*   modelPtr;
 	        std::set<int>   includedSites;

@@ -30,7 +30,8 @@ class Table {
 
 	private:
 	                 void   makeNewParm(void);
-	        std::set<int>   patrons;
+    
+            std::set<int>   patrons;
 			   Alignment*   alignmentPtr;
 				MbRandom*   ranPtr;
 				   Model*   modelPtr;

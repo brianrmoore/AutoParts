@@ -11,7 +11,7 @@ class Parm {
 
 	public:
                 	              Parm(MbRandom* rp, Model* mp, DualStream* lg, std::string nm);
-								 ~Parm(void);
+                        virtual  ~Parm(void);
 						  Parm&   operator=(Parm& b);
 				   virtual void   print(void)=0;
 				 virtual double   update(void)=0;
