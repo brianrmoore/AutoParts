@@ -84,61 +84,60 @@
 class MbTransitionMatrix {
 
 	public:
-                      MbTransitionMatrix(const std::vector<double> &rate, bool useEigen = true);                                  //!< constructor for non-reversible model
-                      MbTransitionMatrix(const std::vector<double> &rate, const std::vector<double> &pi, bool useEigen = true);   //!< constructor for reversible model
-					  MbTransitionMatrix(const MbMatrix<double> &qMat, bool useEigen);
-	                  ~MbTransitionMatrix ();                                                                                     //!< destructor
+                                MbTransitionMatrix(const std::vector<double>& rate, bool useEigen = true);                                  //!< constructor for non-reversible model
+                                MbTransitionMatrix(const std::vector<double>& rate, const std::vector<double>& pi, bool useEigen = true);   //!< constructor for reversible model
+                                MbTransitionMatrix(const MbMatrix<double>& qMat, bool useEigen);
+                               ~MbTransitionMatrix(void);                                                                                     //!< destructor
+        double                  getPadeTolerance(void) { return padeTolerance; }                                                            //!< set tolerance of Pade approximation
+        MbMatrix<double>        getQ(void) { return Q.copy(); }                                                                             //!< return copy of Q matrix
+        std::vector<double>     getStationaryFreqs(void) { return pi; }                                                                     //!< get stationary frequencies (pi)
+        bool                    getUseEigens(void) { return useEigens; }                                                                    //!< is eigensystem used?
+        bool                    isReversible(double tolerance = 1E-6);                                                                      //!< is Q time-reversible?
+        void                    restoreQ(void);                                                                                             //!< restore Q matrix and eigensystem
+        void                    setPadeTolerance(const double tol);                                                                         //!< set tolerance of Pade approximation
+        void                    setUseEigens (const bool flag=true);                                                                        //!< use eigensystem (true) or Pade approx (false)
+        MbMatrix<double>&       tiProbs(const double v, MbMatrix<double>& P);                                                              //!< calculate transition probabilities (P) for length v
+        MbMatrix<double>&       uniformize(double* mu);                                                                                    //!< calculate the uniformized rate matrix from the current Q
+        int                     updateQ(const std::vector<double>& rate);                                                                   //!< update Q matrix (and eigensystem if used)
+        int                     updateQ(const std::vector<double>& rate, const std::vector<double>& pi);                                    //!< update Q matrix (and eigensystem if used)
+        int                     updateQ(const MbMatrix<double>& qTemp);
 
-			  double  getPadeTolerance(void) { return padeTolerance; }                                                            //!< set tolerance of Pade approximation
-	MbMatrix<double>  getQ(void) { return Q.copy(); }                                                                             //!< return copy of Q matrix
- std::vector<double>  getStationaryFreqs(void) { return pi; }                                                                     //!< get stationary frequencies (pi)
-	            bool  getUseEigens(void) { return useEigens; }                                                                    //!< is eigensystem used?
-	            bool  isReversible(double tolerance = 1E-6);                                                                      //!< is Q time-reversible?
-	            void  restoreQ(void);                                                                                             //!< restore Q matrix and eigensystem
-				void  setPadeTolerance(const double tol);                                                                         //!< set tolerance of Pade approximation
-				void  setUseEigens (const bool flag=true);                                                                        //!< use eigensystem (true) or Pade approx (false)
-    MbMatrix<double>  &tiProbs(const double v, MbMatrix<double> &P);                                                              //!< calculate transition probabilities (P) for length v
-	MbMatrix<double>  &uniformize(double *mu);                                                                                    //!< calculate the uniformized rate matrix from the current Q
-	             int  updateQ(const std::vector<double> &rate);                                                                   //!< update Q matrix (and eigensystem if used)
-	             int  updateQ(const std::vector<double> &rate, const std::vector<double> &pi);                                    //!< update Q matrix (and eigensystem if used)
-				 int  updateQ(const MbMatrix<double> &qTemp);
-
-	private:
-	          double  *c_ijk;                                                                                                     //!< vector of precalculated product of eigenvectors and their inverse
-std::complex<double>  *cc_ijk;                                                                                                    //!< vector of precalculated product of eigenvectors and their inverse
-std::complex<double>  *ceigenvalue;                                                                                               //!< vector holding complex eigenvalues
-std::complex<double>  *ceigValExp;                                                                                                //!< working space for calculating exp(-lambda*v) from complex eigensystem
-	   MbEigensystem  *eigens;                                                                                                    //!< pointer to eigensystem object
-	          double  *eigenvalue;                                                                                                //!< vector holding eigenvalues
-              double  *eigValExp;                                                                                                 //!< working space for calculating exp(-lambda*v)
-			    bool  hasUniformizedMatrix;                                                                                       //!< has the uniformized rate matrix been instantiated?
-                bool  isComplex;                                                                                                  //!< does Q have complex eigensystem?
-                bool  isOldComplex;                                                                                               //!< did last Q (oldQ) have complex eigensystem?
-                bool  isRev;                                                                                                      //!< is Q reversible?
-	             int  numStates;                                                                                                  //!< number of states
-	          double  *oldC_ijk;                                                                                                  //!< old precalculated product of eigenvectors and their inverse
-	          double  *oldEigenvalue;                                                                                             //!< old eigenvalues
-std::complex<double>  *oldCC_ijk;                                                                                                 //!< old precalculated product of complex eigenvectors and their inverse
-std::complex<double>  *oldCEigenvalue;                                                                                            //!< old complex eigenvalues
-	MbMatrix<double>  Q;                                                                                                          //!< the Q (rate) matrix
-	MbMatrix<double>  oldQ;                                                                                                       //!< old Q (rate) matrix
- std::vector<double>  pi;                                                                                                         //!< stationary frequencies (for irrev matrix)
-	             int  padeQValue;                                                                                                 //!< integer value used to control error in Pade approximation
-	          double  padeTolerance;                                                                                              //!< tolerance for Pade approximation of matrix exponential
-	MbMatrix<double>  uniformizedQ;                                                                                               //!< matrix that holds the uniformized rate matrix
-                bool  useEigens;                                                                                                  //!< use eigensystem (true) or Pade approximation (false)
-	            void  allocateComplexEigens(void);                                                                                //!< allocate space for complex eigensystem calculations
-	            void  allocateEigens(void);                                                                                       //!< allocate space for eigensystem calculations
-	            void  calcCijk(void);                                                                                             //!< precalculations for matrix exponentiation using eigensystem
-	            void  calcComplexCijk(void);                                                                                      //!< precalculations for matrix exponentiation using complex eigensystem
-	            void  calcStationaryFreq(void);                                                                                   //!< calculate the stationary probabilites
-	            void  freeComplexEigens(void);                                                                                    //!< free space for complex eigensystem calculations
-	            void  freeEigens(void);                                                                                           //!< free space for eigensystem calculations
-	            void  initializeEigenVariables(void);                                                                             //!< initialize local variables for eigensystem calculations
-	            void  rescaleQ(void);                                                                                             //!< rescale Q matrix (using pi)
-	            void  tiProbsComplexEigens(const double v, MbMatrix<double> &P);                                                  //!< calculates transition probabilities using complex eigensystem
-	            void  tiProbsEigens(const double v, MbMatrix<double> &P);                                                         //!< calculates transition probabilities using eigensystem
-	            void  tiProbsPade(const double v, MbMatrix<double> &P);                                                           //!< calculates transition probabilities using Pade approximation
+    private:
+        double*                 c_ijk;                                                                                                     //!< vector of precalculated product of eigenvectors and their inverse
+        std::complex<double>*   cc_ijk;                                                                                                    //!< vector of precalculated product of eigenvectors and their inverse
+        std::complex<double>*   ceigenvalue;                                                                                               //!< vector holding complex eigenvalues
+        std::complex<double>*   ceigValExp;                                                                                                //!< working space for calculating exp(-lambda*v) from complex eigensystem
+        MbEigensystem*          eigens;                                                                                                    //!< pointer to eigensystem object
+        double*                 eigenvalue;                                                                                                //!< vector holding eigenvalues
+        double*                 eigValExp;                                                                                                 //!< working space for calculating exp(-lambda*v)
+        bool                    hasUniformizedMatrix;                                                                                       //!< has the uniformized rate matrix been instantiated?
+        bool                    isComplex;                                                                                                  //!< does Q have complex eigensystem?
+        bool                    isOldComplex;                                                                                               //!< did last Q (oldQ) have complex eigensystem?
+        bool                    isRev;                                                                                                      //!< is Q reversible?
+        int                     numStates;                                                                                                  //!< number of states
+        double*                 oldC_ijk;                                                                                                  //!< old precalculated product of eigenvectors and their inverse
+        double*                 oldEigenvalue;                                                                                             //!< old eigenvalues
+        std::complex<double>*   oldCC_ijk;                                                                                                 //!< old precalculated product of complex eigenvectors and their inverse
+        std::complex<double>*   oldCEigenvalue;                                                                                            //!< old complex eigenvalues
+        MbMatrix<double>        Q;                                                                                                          //!< the Q (rate) matrix
+        MbMatrix<double>        oldQ;                                                                                                       //!< old Q (rate) matrix
+        std::vector<double>     pi;                                                                                                         //!< stationary frequencies (for irrev matrix)
+        int                     padeQValue;                                                                                                 //!< integer value used to control error in Pade approximation
+        double                  padeTolerance;                                                                                              //!< tolerance for Pade approximation of matrix exponential
+        MbMatrix<double>        uniformizedQ;                                                                                               //!< matrix that holds the uniformized rate matrix
+        bool                    useEigens;                                                                                                  //!< use eigensystem (true) or Pade approximation (false)
+        void                    allocateComplexEigens(void);                                                                                //!< allocate space for complex eigensystem calculations
+        void                    allocateEigens(void);                                                                                       //!< allocate space for eigensystem calculations
+        void                    calcCijk(void);                                                                                             //!< precalculations for matrix exponentiation using eigensystem
+        void                    calcComplexCijk(void);                                                                                      //!< precalculations for matrix exponentiation using complex eigensystem
+        void                    calcStationaryFreq(void);                                                                                   //!< calculate the stationary probabilites
+        void                    freeComplexEigens(void);                                                                                    //!< free space for complex eigensystem calculations
+        void                    freeEigens(void);                                                                                           //!< free space for eigensystem calculations
+        void                    initializeEigenVariables(void);                                                                             //!< initialize local variables for eigensystem calculations
+        void                    rescaleQ(void);                                                                                             //!< rescale Q matrix (using pi)
+        void                    tiProbsComplexEigens(const double v, MbMatrix<double> &P);                                                  //!< calculates transition probabilities using complex eigensystem
+        void                    tiProbsEigens(const double v, MbMatrix<double> &P);                                                         //!< calculates transition probabilities using eigensystem
+        void                    tiProbsPade(const double v, MbMatrix<double> &P);                                                           //!< calculates transition probabilities using Pade approximation
 };
 
 #endif

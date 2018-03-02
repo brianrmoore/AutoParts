@@ -1,5 +1,8 @@
 #include <fstream>
 #include <iostream>
+#ifdef AP_MPI
+#   include <mpi.h>
+#endif
 #include "Alignment.h"
 #include "DualStream.h"
 #include "MbRandom.h"
@@ -7,29 +10,25 @@
 #include "Model.h"
 #include "Settings.h"
 
-
-#ifdef AP_MPI
-#include <mpi.h>
-#endif
-
+// prototype
 void printHeader(DualStream& log);
 
 
 
 int main (int argc, char* argv[]) {
     
-    
+    // initialize MPI
 #   ifdef AP_MPI
     try
-    {
+        {
         MPI::Init(argc, argv);
-//        processId = MPI::COMM_WORLD.Get_rank();
-//        numProcesses = MPI::COMM_WORLD.Get_size ();
-    }
+        // processId = MPI::COMM_WORLD.Get_rank();
+        // numProcesses = MPI::COMM_WORLD.Get_size ();
+        }
     catch (char* str)
-    {
+        {
         return -1;
-    }
+        }
 #   endif
     
 	// initialize
@@ -66,7 +65,7 @@ int main (int argc, char* argv[]) {
 
 void printHeader(DualStream& log) {
 
-    log << "AutoParts v 1.0\n";
+    log << "AutoParts v2.0\n";
     log << "John P. Huelsenbeck and Brian Moore\n";
     log << "University of California, Bervis\n";
 }

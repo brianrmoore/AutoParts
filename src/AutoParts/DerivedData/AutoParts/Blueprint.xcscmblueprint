@@ -1,0 +1,23 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2C20F3AD-7F1E-4569-BAC6-9E415C0C3BC1",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB" : "AutoParts\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "AutoParts",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "src\/AutoParts\/AutoParts.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/brianrmoore\/AutoParts.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "00E0EFA60B97F3618B2AEFB2A57B83E72CB6A6BB"
+    }
+  ]
+}

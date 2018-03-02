@@ -120,8 +120,7 @@ SubRates* Model::findSubRates(int part) {
 			}
 		}
 	std::cerr << "ERROR: Could not find SubRates parameter" << std::endl;
-	return NULL;
-	
+	return nullptr;
 }
 
 Tree* Model::findTree(int part) {
@@ -141,8 +140,7 @@ Tree* Model::findTree(int part) {
 			}
 		}
 	std::cerr << "ERROR: Could not find Tree parameter" << std::endl;
-	return NULL;
-	
+	return nullptr;
 }
 
 TreeLength* Model::findTreeLength(int part) {
@@ -162,7 +160,7 @@ TreeLength* Model::findTreeLength(int part) {
 			}
 		}
 	std::cerr << "ERROR: Could not find TreeLength parameter" << std::endl;
-	return NULL;
+	return nullptr;
 }
 
 int Model::getRestaurantId(Restaurant* rest) {

@@ -12,7 +12,7 @@
 
 
 
-StateSets::StateSets(Alignment *ap, Settings *sp) {
+StateSets::StateSets(Alignment* ap, Settings* sp) {
 
 	// give the user a clue as to what we are doing
 	std::cout << "   Setting up state sets" << std::endl;
@@ -70,9 +70,9 @@ StateSets::StateSets(Alignment *ap, Settings *sp) {
 	// initialize the tip state sets
 	for (int i=0; i<numTaxa; i++)
 		{
-		unsigned *st0 = stsPtr[0][i];
-		unsigned *st1 = stsPtr[1][i];
-		unsigned *st2 = stsPtr[2][i];
+		unsigned* st0 = stsPtr[0][i];
+		unsigned* st1 = stsPtr[1][i];
+		unsigned* st2 = stsPtr[2][i];
 		for (int c=0; c<numChar; c++)
 			{
 			int nucCode = alignmentPtr->getNucleotide(i, c);
@@ -108,9 +108,9 @@ StateSets::StateSets(void) {
 
 int StateSets::calcStateSetFor(int s1, int n1, int s2, int n2, int s3, int n3) {
 
-	unsigned *ss1 = stsPtr[s1][n1];
-	unsigned *ss2 = stsPtr[s2][n2];
-	unsigned *ss3 = stsPtr[s3][n3];
+	unsigned* ss1 = stsPtr[s1][n1];
+	unsigned* ss2 = stsPtr[s2][n2];
+	unsigned* ss3 = stsPtr[s3][n3];
 	int numChanges = 0;
 	for (int c=0; c<numChar; c++)
 		{
@@ -131,11 +131,11 @@ int StateSets::calcStateSetFor(int s1, int n1, int s2, int n2, int s3, int n3) {
 	return numChanges;
 }
 
-int StateSets::initializeStateSets(Node **dp, int nNds) {
+int StateSets::initializeStateSets(Node** dp, int nNds) {
 	
 	if (nNds == 1)
 		{
-		Node *p = dp[0];
+		Node* p = dp[0];
 		int idx = p->getIndex();
 		unsigned *ssU = stsPtr[UPPER][idx];
 		unsigned *ssM = stsPtr[MIDDLE][idx];
@@ -157,8 +157,8 @@ int StateSets::initializeStateSets(Node **dp, int nNds) {
 	int parsimonyLength = 0;
 	for (int n=0; n<nNds; n++)
 		{
-		Node *p = dp[n];
-		if ( p->getLft() == NULL && p->getRht() == NULL && p->getAnc() != NULL )
+		Node* p = dp[n];
+		if ( p->getLft() == nullptr && p->getRht() == nullptr && p->getAnc() != nullptr )
 			{
 			/* tip */
 			int idx = p->getIndex();
@@ -169,7 +169,7 @@ int StateSets::initializeStateSets(Node **dp, int nNds) {
 				ss++;
 				}
 			}
-		else if ( p->getAnc() == NULL )
+		else if ( p->getAnc() == nullptr )
 			{
 			/* tip */
 			int idx = p->getIndex();
@@ -191,9 +191,9 @@ int StateSets::initializeStateSets(Node **dp, int nNds) {
 		else
 			{
 			/* interior node */
-			unsigned *ss  = stsPtr[UPPER][p->getIndex()];
-			unsigned *ssL = stsPtr[UPPER][p->getLft()->getIndex()];
-			unsigned *ssR = stsPtr[UPPER][p->getRht()->getIndex()];
+			unsigned* ss  = stsPtr[UPPER][p->getIndex()];
+			unsigned* ssL = stsPtr[UPPER][p->getLft()->getIndex()];
+			unsigned* ssR = stsPtr[UPPER][p->getRht()->getIndex()];
 			for (int c=0; c<numChar; c++)
 				{
 				unsigned x = (*ssL);
@@ -218,19 +218,19 @@ int StateSets::initializeStateSets(Node **dp, int nNds) {
 	// pass up
 	for (int n=nNds-1; n>=0; n--)
 		{
-		Node *p = dp[n];
-		if ( p->getAnc() != NULL )
+		Node* p = dp[n];
+		if ( p->getAnc() != nullptr )
 			{
-			if ( p->getAnc()->getAnc() != NULL )
+			if ( p->getAnc()->getAnc() != nullptr )
 				{
-				Node *pU;
+				Node* pU;
 				if (p->getAnc()->getLft() == p)
 					pU = p->getAnc()->getRht();
 				else
 					pU = p->getAnc()->getLft();
-				unsigned *ss  = stsPtr[LOWER][p->getIndex()];
-				unsigned *ssL = stsPtr[LOWER][p->getAnc()->getIndex()];
-				unsigned *ssU = stsPtr[UPPER][pU->getIndex()];
+				unsigned* ss  = stsPtr[LOWER][p->getIndex()];
+				unsigned* ssL = stsPtr[LOWER][p->getAnc()->getIndex()];
+				unsigned* ssU = stsPtr[UPPER][pU->getIndex()];
 				for (int c=0; c<numChar; c++)
 					{
 					unsigned x = (*ssU);
@@ -254,13 +254,13 @@ int StateSets::initializeStateSets(Node **dp, int nNds) {
 	// get state sets for center
 	for (int n=0; n<nNds; n++)
 		{
-		Node *p = dp[n];
-		if ( p->getAnc() != NULL )
+		Node* p = dp[n];
+		if ( p->getAnc() != nullptr )
 			{
 			int idx = p->getIndex();
-			unsigned *ssU = stsPtr[UPPER][idx];
-			unsigned *ssL = stsPtr[LOWER][idx];
-			unsigned *ssM = stsPtr[MIDDLE][idx];
+			unsigned* ssU = stsPtr[UPPER][idx];
+			unsigned* ssL = stsPtr[LOWER][idx];
+			unsigned* ssM = stsPtr[MIDDLE][idx];
 			for (int c=0; c<numChar; c++)
 				{
 				unsigned x = (*ssU);

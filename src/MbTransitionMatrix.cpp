@@ -132,8 +132,6 @@ MbTransitionMatrix::MbTransitionMatrix(const std::vector<double> &rate, const st
  * but it works equally well for other characters with discrete states.
  * 
  * \brief Creates time-reversible transition matrix
- * \param rate Vector of rates
- * \param pi Vector of stationary state frequencies
  * \param useEigen Use eigensystem (true) or Pade approximation (false)
  * 
  */

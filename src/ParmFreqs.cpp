@@ -7,7 +7,7 @@
 
 #pragma mark Constructors
 
-BaseFreqs::BaseFreqs(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double tn) : Parm(rp, mp, lg, nm) {
+BaseFreqs::BaseFreqs(MbRandom* rp, Model* mp, DualStream* lg, std::string nm, double tn) : Parm(rp, mp, lg, nm) {
 
 	f = std::vector<double>( 4 );
 	a = std::vector<double>( 4 );
@@ -15,15 +15,13 @@ BaseFreqs::BaseFreqs(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, do
 	for (int i=0; i<4; i++)
 		a[i] = 1.0;
 	ranPtr->dirichletRv(a, f);
-		
 }
 
-BaseFreqs::BaseFreqs(BaseFreqs &b) : Parm(b.ranPtr, b.modelPtr, b.outLog, b.parmName) {
+BaseFreqs::BaseFreqs(BaseFreqs& b) : Parm(b.ranPtr, b.modelPtr, b.outLog, b.parmName) {
 
 	f = std::vector<double>( 4 );
 	a = std::vector<double>( 4 );
 	clone( b );
-		
 }
 
 #pragma mark Destructor
@@ -34,14 +32,13 @@ BaseFreqs::~BaseFreqs(void) {
 
 #pragma mark Operators
 
-BaseFreqs &BaseFreqs::operator=(BaseFreqs &b) {
+BaseFreqs& BaseFreqs::operator=(BaseFreqs& b) {
 
 	if (this != &b)
 		{
 		Parm::operator=(b);
 		}
 	return *this;
-
 }
 
 #pragma mark Class Functions
@@ -49,7 +46,6 @@ BaseFreqs &BaseFreqs::operator=(BaseFreqs &b) {
 double BaseFreqs::lnPriorProb(void) {
 
 	return ranPtr->lnDirichletPdf(a, f);
-	
 }
 
 std::string BaseFreqs::getParmString(int n) {
@@ -58,7 +54,6 @@ std::string BaseFreqs::getParmString(int n) {
 	sprintf(temp, "%lf\t%lf\t%lf\t%lf\t", f[0], f[1], f[2], f[3]);
 	std::string tempString = temp;
 	return tempString;
-	
 }
 
 std::string BaseFreqs::getParmHeader(int n) {
@@ -86,10 +81,9 @@ double BaseFreqs::update(void) {
 	for (int i=0; i<4; i++)
 		aReverse[i] = f[i] * alpha0;
 	return ranPtr->lnDirichletPdf(aReverse, oldFreqs) - ranPtr->lnDirichletPdf(aForward, f);
-	
 }
 
-void BaseFreqs::clone(BaseFreqs &b) {
+void BaseFreqs::clone(BaseFreqs& b) {
 
 	alpha0 = b.alpha0;
 	for (int i=0; i<4; i++)
@@ -97,7 +91,6 @@ void BaseFreqs::clone(BaseFreqs &b) {
 		a[i] = 1.0;
 		f[i] = b.f[i];
 		}
-
 }
 
 void BaseFreqs::print(void) {

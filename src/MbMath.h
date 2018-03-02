@@ -49,17 +49,17 @@
  */
 namespace MbMath {
 
-      void   backSubstitutionRow(MbMatrix<double> &u, std::vector<double> &b);                            //!< back substitution of row
-      void   computeLandU(MbMatrix<double> &aMat, MbMatrix<double> &lMat, MbMatrix<double> &uMat);        //!< LU decomposition
-       int   expMatrixPade(MbMatrix<double> &a, MbMatrix<double> &f, int q);                              //!< exponentiate matrix using Pade approximation
-    double   factorial(int x);                                                                            //!< return x! (x factorial)
-       int   findPadeQValue(const double tolerance);                                                      //!< set p and q of the Pade method to achieve desired tolerance
-      void   forwardSubstitutionRow(MbMatrix<double> &L, std::vector<double> &b);                         //!< forward substitution of row
-      void   gaussianElimination (MbMatrix<double> &a, MbMatrix<double> &bMat, MbMatrix<double> &xMat);   //!< gaussian elimination
-    double   hypotenuse(double a, double b);                                                              //!< return hypotenuse of triangle with legs a and b
-    double   lnFactorial(int x);                                                                          //!< return ln(x!)
-	double   lnGamma(double alp);                                                                         //!< return lnGamma(alp)
-       int   transposeMatrix(const MbMatrix<double> &a, MbMatrix<double> &t);                             //!< transpose matrix
+    void    backSubstitutionRow(MbMatrix<double> &u, std::vector<double> &b);                            //!< back substitution of row
+    void    computeLandU(MbMatrix<double> &aMat, MbMatrix<double> &lMat, MbMatrix<double> &uMat);        //!< LU decomposition
+    int     expMatrixPade(MbMatrix<double> &a, MbMatrix<double> &f, int q);                              //!< exponentiate matrix using Pade approximation
+    double  factorial(int x);                                                                            //!< return x! (x factorial)
+    int     findPadeQValue(const double tolerance);                                                      //!< set p and q of the Pade method to achieve desired tolerance
+    void    forwardSubstitutionRow(MbMatrix<double> &L, std::vector<double> &b);                         //!< forward substitution of row
+    void    gaussianElimination (MbMatrix<double> &a, MbMatrix<double> &bMat, MbMatrix<double> &xMat);   //!< gaussian elimination
+    double  hypotenuse(double a, double b);                                                              //!< return hypotenuse of triangle with legs a and b
+    double  lnFactorial(int x);                                                                          //!< return ln(x!)
+    double  lnGamma(double alp);                                                                         //!< return lnGamma(alp)
+    int     transposeMatrix(const MbMatrix<double> &a, MbMatrix<double> &t);                             //!< transpose matrix
 }
 
 #endif

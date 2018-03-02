@@ -44,8 +44,6 @@
  * system time.
  *
  * \brief Constructor for MbRandom, initializing seed with system time.
- * \param Takes no parameter.
- * \return Returns no value.
  * \throws Does not throw an error.
  */
 MbRandom::MbRandom(void) {
@@ -62,7 +60,6 @@ MbRandom::MbRandom(void) {
  *
  * \brief Constructor for MbRandom, initializing seed with a user-supplied long integer.
  * \param x is a long integer with the user-supplied random number seed.
- * \return Returns no value.
  * \throws Does not throw an error.
  */
 MbRandom::MbRandom(seedType x) {
@@ -601,9 +598,9 @@ double MbRandom::betaQuantile(double a, double b, double p) {
  * This function generates a Dirichlet-distributed random variable.
  *
  * \brief Dirichlet random variable.
- * \param *a is a pointer to a vector of doubles containing the parameters of the Dirichlet. 
+ * \param &a is a pointer to a vector of doubles containing the parameters of the Dirichlet.
  * \param n is an integer with the number of Dirichlet prameters. 
- * \param *z is a pointer to a vector of doubles containing the Dirichlet random variable. 
+ * \param &z is a pointer to a vector of doubles containing the Dirichlet random variable. 
  * \return Does not return a value (the random variable is initialized in the parameter z).
  * \throws Does not throw an error.
  */

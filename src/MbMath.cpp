@@ -45,7 +45,6 @@
  * \brief Back-substitution
  * \param u Matrix to back substitute
  * \param b Solution vector
- * \return Returns nothing
  */
 void MbMath::backSubstitutionRow(MbMatrix<double> &u, std::vector<double> &b) {
 
@@ -68,7 +67,6 @@ void MbMath::backSubstitutionRow(MbMatrix<double> &u, std::vector<double> &b) {
  * \param aMat The matrix to LU decompose (destroyed)
  * \param lMat The L matrix
  * \param uMat The U matrix
- * \return Returns nothing
  */
 void MbMath::computeLandU(MbMatrix<double> &aMat, MbMatrix<double> &lMat, MbMatrix<double> &uMat) {
 
@@ -111,8 +109,8 @@ void MbMath::computeLandU(MbMatrix<double> &aMat, MbMatrix<double> &lMat, MbMatr
  * is controlled by setting qValue appropriately (using the function SetQValue).
  *
  * \brief Pade approximation of Matrix exponential
- * \param a [in] Input matrix
- * \param f [out] Output matrix, e^a
+ * \param A [in] Input matrix
+ * \param F [out] Output matrix, e^a
  * \return Returns nothing
  * \see
  * Golub, G. H., and C. F. Van Loan. 1996. Matrix Computations, Third Edition.
@@ -213,7 +211,6 @@ double MbMath::factorial(int x) {
  * \brief Forward substitution
  * \param L [in/out] Matrix for forward substitution
  * \param b [in/out] Solution vector
- * \return Returns nothing
  */
 void MbMath::forwardSubstitutionRow(MbMatrix<double> &L, std::vector<double> &b) {
 
@@ -235,7 +232,6 @@ void MbMath::forwardSubstitutionRow(MbMatrix<double> &L, std::vector<double> &b)
  * \param a ??
  * \param bMat ??
  * \param xMat ??
- * \return Returns nothing
  */
 void MbMath::gaussianElimination (MbMatrix<double> &a, MbMatrix<double> &bMat, MbMatrix<double> &xMat) {
 

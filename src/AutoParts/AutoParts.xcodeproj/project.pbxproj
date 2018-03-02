@@ -1,0 +1,394 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		227069A52049D49C0003052C /* Chunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270697B2049D4970003052C /* Chunk.cpp */; };
+		227069A62049D49C0003052C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270697C2049D4970003052C /* main.cpp */; };
+		227069A72049D49C0003052C /* Parm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270697F2049D4970003052C /* Parm.cpp */; };
+		227069A82049D49C0003052C /* ParmSubrates.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069802049D4970003052C /* ParmSubrates.cpp */; };
+		227069A92049D49C0003052C /* Mcmc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069842049D4970003052C /* Mcmc.cpp */; };
+		227069AA2049D49C0003052C /* ParmLength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069852049D4970003052C /* ParmLength.cpp */; };
+		227069AB2049D49C0003052C /* MbRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069882049D4980003052C /* MbRandom.cpp */; };
+		227069AC2049D49C0003052C /* StateSets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069892049D4980003052C /* StateSets.cpp */; };
+		227069AD2049D49C0003052C /* Table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270698D2049D4980003052C /* Table.cpp */; };
+		227069AE2049D49C0003052C /* Alignment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270698F2049D4980003052C /* Alignment.cpp */; };
+		227069AF2049D49C0003052C /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069922049D4990003052C /* Model.cpp */; };
+		227069B02049D49C0003052C /* Restaurant_summary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069932049D4990003052C /* Restaurant_summary.cpp */; };
+		227069B12049D49C0003052C /* MbTransitionMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069942049D4990003052C /* MbTransitionMatrix.cpp */; };
+		227069B22049D49C0003052C /* ParmFreqs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069972049D4990003052C /* ParmFreqs.cpp */; };
+		227069B32049D49C0003052C /* ParmAsrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069992049D49A0003052C /* ParmAsrv.cpp */; };
+		227069B42049D49C0003052C /* MbEigensystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270699A2049D49A0003052C /* MbEigensystem.cpp */; };
+		227069B52049D49C0003052C /* MbMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270699C2049D49A0003052C /* MbMath.cpp */; };
+		227069B62049D49C0003052C /* Restaurant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270699D2049D49A0003052C /* Restaurant.cpp */; };
+		227069B72049D49C0003052C /* Mcmc_summary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270699E2049D49A0003052C /* Mcmc_summary.cpp */; };
+		227069B82049D49C0003052C /* ParmTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2270699F2049D49B0003052C /* ParmTree.cpp */; };
+		227069B92049D49C0003052C /* Settings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227069A12049D49B0003052C /* Settings.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2270696F2049D4680003052C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		227069712049D4680003052C /* AutoParts */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AutoParts; sourceTree = BUILT_PRODUCTS_DIR; };
+		2270697B2049D4970003052C /* Chunk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Chunk.cpp; path = ../../Chunk.cpp; sourceTree = "<group>"; };
+		2270697C2049D4970003052C /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../main.cpp; sourceTree = "<group>"; };
+		2270697D2049D4970003052C /* Parm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Parm.h; path = ../../Parm.h; sourceTree = "<group>"; };
+		2270697E2049D4970003052C /* ParmSubrates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParmSubrates.h; path = ../../ParmSubrates.h; sourceTree = "<group>"; };
+		2270697F2049D4970003052C /* Parm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Parm.cpp; path = ../../Parm.cpp; sourceTree = "<group>"; };
+		227069802049D4970003052C /* ParmSubrates.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmSubrates.cpp; path = ../../ParmSubrates.cpp; sourceTree = "<group>"; };
+		227069812049D4970003052C /* Table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Table.h; path = ../../Table.h; sourceTree = "<group>"; };
+		227069822049D4970003052C /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = ../../Settings.h; sourceTree = "<group>"; };
+		227069832049D4970003052C /* MbEigensystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MbEigensystem.h; path = ../../MbEigensystem.h; sourceTree = "<group>"; };
+		227069842049D4970003052C /* Mcmc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mcmc.cpp; path = ../../Mcmc.cpp; sourceTree = "<group>"; };
+		227069852049D4970003052C /* ParmLength.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmLength.cpp; path = ../../ParmLength.cpp; sourceTree = "<group>"; };
+		227069862049D4970003052C /* ParmAsrv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParmAsrv.h; path = ../../ParmAsrv.h; sourceTree = "<group>"; };
+		227069872049D4980003052C /* ParmTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParmTree.h; path = ../../ParmTree.h; sourceTree = "<group>"; };
+		227069882049D4980003052C /* MbRandom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MbRandom.cpp; path = ../../MbRandom.cpp; sourceTree = "<group>"; };
+		227069892049D4980003052C /* StateSets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StateSets.cpp; path = ../../StateSets.cpp; sourceTree = "<group>"; };
+		2270698A2049D4980003052C /* MbRandom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MbRandom.h; path = ../../MbRandom.h; sourceTree = "<group>"; };
+		2270698B2049D4980003052C /* DualStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DualStream.h; path = ../../DualStream.h; sourceTree = "<group>"; };
+		2270698C2049D4980003052C /* Restaurant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Restaurant.h; path = ../../Restaurant.h; sourceTree = "<group>"; };
+		2270698D2049D4980003052C /* Table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Table.cpp; path = ../../Table.cpp; sourceTree = "<group>"; };
+		2270698E2049D4980003052C /* MbMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MbMath.h; path = ../../MbMath.h; sourceTree = "<group>"; };
+		2270698F2049D4980003052C /* Alignment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Alignment.cpp; path = ../../Alignment.cpp; sourceTree = "<group>"; };
+		227069902049D4980003052C /* MbTransitionMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MbTransitionMatrix.h; path = ../../MbTransitionMatrix.h; sourceTree = "<group>"; };
+		227069912049D4990003052C /* Mcmc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Mcmc.h; path = ../../Mcmc.h; sourceTree = "<group>"; };
+		227069922049D4990003052C /* Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Model.cpp; path = ../../Model.cpp; sourceTree = "<group>"; };
+		227069932049D4990003052C /* Restaurant_summary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Restaurant_summary.cpp; path = ../../Restaurant_summary.cpp; sourceTree = "<group>"; };
+		227069942049D4990003052C /* MbTransitionMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MbTransitionMatrix.cpp; path = ../../MbTransitionMatrix.cpp; sourceTree = "<group>"; };
+		227069952049D4990003052C /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Model.h; path = ../../Model.h; sourceTree = "<group>"; };
+		227069962049D4990003052C /* ParmFreqs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParmFreqs.h; path = ../../ParmFreqs.h; sourceTree = "<group>"; };
+		227069972049D4990003052C /* ParmFreqs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmFreqs.cpp; path = ../../ParmFreqs.cpp; sourceTree = "<group>"; };
+		227069982049D4990003052C /* MbMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MbMatrix.h; path = ../../MbMatrix.h; sourceTree = "<group>"; };
+		227069992049D49A0003052C /* ParmAsrv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmAsrv.cpp; path = ../../ParmAsrv.cpp; sourceTree = "<group>"; };
+		2270699A2049D49A0003052C /* MbEigensystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MbEigensystem.cpp; path = ../../MbEigensystem.cpp; sourceTree = "<group>"; };
+		2270699B2049D49A0003052C /* ParmLength.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParmLength.h; path = ../../ParmLength.h; sourceTree = "<group>"; };
+		2270699C2049D49A0003052C /* MbMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MbMath.cpp; path = ../../MbMath.cpp; sourceTree = "<group>"; };
+		2270699D2049D49A0003052C /* Restaurant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Restaurant.cpp; path = ../../Restaurant.cpp; sourceTree = "<group>"; };
+		2270699E2049D49A0003052C /* Mcmc_summary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mcmc_summary.cpp; path = ../../Mcmc_summary.cpp; sourceTree = "<group>"; };
+		2270699F2049D49B0003052C /* ParmTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmTree.cpp; path = ../../ParmTree.cpp; sourceTree = "<group>"; };
+		227069A02049D49B0003052C /* Alignment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Alignment.h; path = ../../Alignment.h; sourceTree = "<group>"; };
+		227069A12049D49B0003052C /* Settings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Settings.cpp; path = ../../Settings.cpp; sourceTree = "<group>"; };
+		227069A22049D49B0003052C /* StateSets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StateSets.h; path = ../../StateSets.h; sourceTree = "<group>"; };
+		227069A32049D49C0003052C /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../../Util.h; sourceTree = "<group>"; };
+		227069A42049D49C0003052C /* Chunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Chunk.h; path = ../../Chunk.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2270696E2049D4680003052C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		227069682049D4680003052C = {
+			isa = PBXGroup;
+			children = (
+				227069732049D4680003052C /* AutoParts */,
+				227069722049D4680003052C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		227069722049D4680003052C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				227069712049D4680003052C /* AutoParts */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		227069732049D4680003052C /* AutoParts */ = {
+			isa = PBXGroup;
+			children = (
+				2270698F2049D4980003052C /* Alignment.cpp */,
+				227069A02049D49B0003052C /* Alignment.h */,
+				2270697B2049D4970003052C /* Chunk.cpp */,
+				227069A42049D49C0003052C /* Chunk.h */,
+				2270698B2049D4980003052C /* DualStream.h */,
+				2270697C2049D4970003052C /* main.cpp */,
+				2270699A2049D49A0003052C /* MbEigensystem.cpp */,
+				227069832049D4970003052C /* MbEigensystem.h */,
+				2270699C2049D49A0003052C /* MbMath.cpp */,
+				2270698E2049D4980003052C /* MbMath.h */,
+				227069982049D4990003052C /* MbMatrix.h */,
+				227069882049D4980003052C /* MbRandom.cpp */,
+				2270698A2049D4980003052C /* MbRandom.h */,
+				227069942049D4990003052C /* MbTransitionMatrix.cpp */,
+				227069902049D4980003052C /* MbTransitionMatrix.h */,
+				2270699E2049D49A0003052C /* Mcmc_summary.cpp */,
+				227069842049D4970003052C /* Mcmc.cpp */,
+				227069912049D4990003052C /* Mcmc.h */,
+				227069922049D4990003052C /* Model.cpp */,
+				227069952049D4990003052C /* Model.h */,
+				2270697F2049D4970003052C /* Parm.cpp */,
+				2270697D2049D4970003052C /* Parm.h */,
+				227069992049D49A0003052C /* ParmAsrv.cpp */,
+				227069862049D4970003052C /* ParmAsrv.h */,
+				227069972049D4990003052C /* ParmFreqs.cpp */,
+				227069962049D4990003052C /* ParmFreqs.h */,
+				227069852049D4970003052C /* ParmLength.cpp */,
+				2270699B2049D49A0003052C /* ParmLength.h */,
+				227069802049D4970003052C /* ParmSubrates.cpp */,
+				2270697E2049D4970003052C /* ParmSubrates.h */,
+				2270699F2049D49B0003052C /* ParmTree.cpp */,
+				227069872049D4980003052C /* ParmTree.h */,
+				227069932049D4990003052C /* Restaurant_summary.cpp */,
+				2270699D2049D49A0003052C /* Restaurant.cpp */,
+				2270698C2049D4980003052C /* Restaurant.h */,
+				227069A12049D49B0003052C /* Settings.cpp */,
+				227069822049D4970003052C /* Settings.h */,
+				227069892049D4980003052C /* StateSets.cpp */,
+				227069A22049D49B0003052C /* StateSets.h */,
+				2270698D2049D4980003052C /* Table.cpp */,
+				227069812049D4970003052C /* Table.h */,
+				227069A32049D49C0003052C /* Util.h */,
+			);
+			path = AutoParts;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		227069702049D4680003052C /* AutoParts */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 227069782049D4680003052C /* Build configuration list for PBXNativeTarget "AutoParts" */;
+			buildPhases = (
+				2270696D2049D4680003052C /* Sources */,
+				2270696E2049D4680003052C /* Frameworks */,
+				2270696F2049D4680003052C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AutoParts;
+			productName = AutoParts;
+			productReference = 227069712049D4680003052C /* AutoParts */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		227069692049D4680003052C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = "John Huelsenbeck";
+				TargetAttributes = {
+					227069702049D4680003052C = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 2270696C2049D4680003052C /* Build configuration list for PBXProject "AutoParts" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 227069682049D4680003052C;
+			productRefGroup = 227069722049D4680003052C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				227069702049D4680003052C /* AutoParts */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2270696D2049D4680003052C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				227069A72049D49C0003052C /* Parm.cpp in Sources */,
+				227069AE2049D49C0003052C /* Alignment.cpp in Sources */,
+				227069AB2049D49C0003052C /* MbRandom.cpp in Sources */,
+				227069B32049D49C0003052C /* ParmAsrv.cpp in Sources */,
+				227069A62049D49C0003052C /* main.cpp in Sources */,
+				227069B52049D49C0003052C /* MbMath.cpp in Sources */,
+				227069A82049D49C0003052C /* ParmSubrates.cpp in Sources */,
+				227069B72049D49C0003052C /* Mcmc_summary.cpp in Sources */,
+				227069AA2049D49C0003052C /* ParmLength.cpp in Sources */,
+				227069AF2049D49C0003052C /* Model.cpp in Sources */,
+				227069A52049D49C0003052C /* Chunk.cpp in Sources */,
+				227069B92049D49C0003052C /* Settings.cpp in Sources */,
+				227069AD2049D49C0003052C /* Table.cpp in Sources */,
+				227069B12049D49C0003052C /* MbTransitionMatrix.cpp in Sources */,
+				227069B82049D49C0003052C /* ParmTree.cpp in Sources */,
+				227069B02049D49C0003052C /* Restaurant_summary.cpp in Sources */,
+				227069B22049D49C0003052C /* ParmFreqs.cpp in Sources */,
+				227069B62049D49C0003052C /* Restaurant.cpp in Sources */,
+				227069AC2049D49C0003052C /* StateSets.cpp in Sources */,
+				227069B42049D49C0003052C /* MbEigensystem.cpp in Sources */,
+				227069A92049D49C0003052C /* Mcmc.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		227069762049D4680003052C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		227069772049D4680003052C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		227069792049D4680003052C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2270697A2049D4680003052C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2270696C2049D4680003052C /* Build configuration list for PBXProject "AutoParts" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				227069762049D4680003052C /* Debug */,
+				227069772049D4680003052C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		227069782049D4680003052C /* Build configuration list for PBXNativeTarget "AutoParts" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				227069792049D4680003052C /* Debug */,
+				2270697A2049D4680003052C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 227069692049D4680003052C /* Project object */;
+}

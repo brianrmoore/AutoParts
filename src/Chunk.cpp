@@ -2,6 +2,12 @@
 #include <iomanip>
 #include <map>
 #include <set>
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
+#ifdef AP_MPI
+#   include <mpi.h>
+#endif
 #include "Alignment.h"
 #include "Chunk.h"
 #include "MbMatrix.h"
@@ -15,25 +21,16 @@
 #include "Settings.h"
 
 
-#include <xmmintrin.h>
-#include <emmintrin.h>
-#include <pmmintrin.h>
-
-
-#ifdef AP_MPI
-#include <mpi.h>
-#endif
-
 
 
 Chunk::Chunk(Alignment* ap, Settings* sp, Model* mp, int si) {
 
     pid = 0;
     numProcesses = 1;
-#ifdef AP_MPI
+#   ifdef AP_MPI
     pid = MPI::COMM_WORLD.Get_rank();
     numProcesses = MPI::COMM_WORLD.Get_size ();
-#endif
+#   endif
     
 	// remember the location of important objects
 	alignmentPtr = ap;
@@ -138,8 +135,8 @@ Chunk::~Chunk(void) {
 }
 
 
-void Chunk::compress( void )
-{
+void Chunk::compress( void ) {
+
     bool doCompression = true;
     bool treatAmbiguousAsGaps = false;
     
@@ -158,31 +155,31 @@ void Chunk::compress( void )
 
     // find the unique site patterns and compute their respective frequencies
     for (std::set<int>::iterator it = includedSites.begin(); it != includedSites.end(); ++it)
-    {
+        {
         int site = *it;
         for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
-        {
+            {
             int nucCode = alignmentPtr->getNucleotide(i, site);
             
             // if we treat unknown characters as gaps and this is an unknown character then we change it
             // because we might then have a pattern more
             if ( treatAmbiguousAsGaps && isAmbiguous(nucCode) )
-            {
+                {
                 nucCode = 15;
-            }
+                }
             else if ( nucCode != 15 && isAmbiguous(nucCode) )
-            {
+                {
                 ambiguousCharacters = true;
                 break;
+                }
             }
-        }
         
         // break the loop if there was an ambiguous character
         if ( ambiguousCharacters )
-        {
+            {
             break;
+            }
         }
-    }
     
     // set the global variable if we use ambiguous characters
     usingAmbiguousCharacters = ambiguousCharacters;
@@ -191,32 +188,32 @@ void Chunk::compress( void )
     std::vector<bool> unique(numSites, true);
     // compress the character matrix
     if ( doCompression == true )
-    {
+        {
         // find the unique site patterns and compute their respective frequencies
         std::map<std::string,size_t> patterns;
         std::set<int>::iterator it = includedSites.begin();
         for (size_t site = 0; site < numSites; ++site, ++it)
-        {
+            {
             // create the site pattern
             std::string pattern = "";
             for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
-            {
+                {
                 int nucCode = alignmentPtr->getNucleotide(i, *it);
                 pattern += nucAsStringValue(nucCode);
-            }
+                }
             // check if we have already seen this site pattern
             std::map<std::string, size_t>::const_iterator index = patterns.find( pattern );
             if ( index != patterns.end() )
-            {
+                {
                 // we have already seen this pattern
                 // increase the frequency counter
                 patternCounts[ index->second ]++;
             
                 // obviously this site isn't unique nor the first encounter
                 unique[site] = false;
-            }
+                }
             else
-            {
+                {
                 // create a new pattern frequency counter for this pattern
                 patternCounts.push_back(1);
                 
@@ -228,71 +225,66 @@ void Chunk::compress( void )
                 
                 // flag that this site is unique (or the first occurence of this pattern)
                 unique[site] = true;
-            }
+                }
         
+            }
         }
-    }
     else
-    {
+        {
         // we do not compress
         numPatterns = numSites;
         patternCounts = std::vector<size_t>(numSites,1);
-    }
+        }
     
     
     // allocate and fill the cells of the matrices
     for (int i=0; i<alignmentPtr->getNumTaxa(); i++)
-    {
-     
+        {
         // resize the column
         charMatrix[i].resize(numPatterns);
         gapMatrix[i].resize(numPatterns);
         size_t patternIndex = 0;
         std::set<int>::iterator it = includedSites.begin();
         for (size_t site = 0; site < numSites; ++site, ++it)
-        {
+            {
             // only add this site if it is unique
             if ( unique[site] )
-            {
+                {
                 int nucCode = alignmentPtr->getNucleotide(i, *it);
                 gapMatrix[i][patternIndex] = (nucCode == 15);
                     
                 if ( ambiguousCharacters )
-                {
+                    {
                     // we use the actual state
                     charMatrix[i][patternIndex] = nucCode;
-                }
+                    }
                 else
-                {
+                    {
                     // we use the index of the state
                     size_t index = 0;
                     unsigned long state = nucCode;
                     state >>= 1;
                         
                     while ( state != 0 ) // there are still observed states left
-                    {
-                            
+                        {
                         // remove this state from the observed states
                         state >>= 1;
                             
                         // increment the index
                         ++index;
-                    } // end-while over all observed states for this character
+                        } // end-while over all observed states for this character
                         
                     charMatrix[i][patternIndex] = index;
-                }
+                    }
                     
                 // increase the pattern index
                 patternIndex++;
+                }
             }
         }
-    }
-    
 }
 
-
-bool Chunk::isAmbiguous(int nc)
-{
+bool Chunk::isAmbiguous(int nc) {
     
     return !(nc == 1 || nc == 2 || nc == 4 || nc == 8);
 }
@@ -310,20 +302,19 @@ double Chunk::lnLikelihood(bool storeScore) {
 		
 	/* pass down tree, filling in conditional likelihoods using the sum-product algorithm
 	   (Felsenstein pruning algorithm) */
-	double *lnScaler = new double[numPatterns];
+	double* lnScaler = new double[numPatterns];
 	for (int i=0; i<numPatterns; i++)
-    {
+        {
 		lnScaler[i] = 0.0;
-    }
-    
+        }
     
 	for (int n=0; n<treePtr->getNumNodes(); n++)
-    {
+        {
 		Node* p = treePtr->getDownPassNode( n );
 		if ( p->getIsLeaf() == false )
-        {
-			if (p->getAnc()->getAnc() == NULL)
             {
+			if (p->getAnc()->getAnc() == nullptr)
+                {
 				/* three-way split */
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
@@ -334,10 +325,9 @@ double Chunk::lnLikelihood(bool storeScore) {
 				double *clA = getClsForNode(ancIdx) + pattern_block_start*stride;
 				double *clP = getClsForNode(idx   ) + pattern_block_start*stride;
 				for (size_t c=pattern_block_start; c<pattern_block_end; c++)
-                {
-					for (int k=0; k<numGammaCats; k++)
                     {
-                            
+					for (int k=0; k<numGammaCats; k++)
+                        {
                         __m128d clL_01 = _mm_load_pd(clL);
                         __m128d clL_23 = _mm_load_pd(clL+2);
                             
@@ -467,11 +457,11 @@ double Chunk::lnLikelihood(bool storeScore) {
                         clL += 4;
                         clR += 4;
                         clA += 4;
+                        }
                     }
                 }
-            }
 			else
-            {
+                {
 				/* two-way split */
 				int lftIdx = p->getLft()->getIndex();
 				int rhtIdx = p->getRht()->getIndex();
@@ -480,9 +470,9 @@ double Chunk::lnLikelihood(bool storeScore) {
 				double *clR = getClsForNode(rhtIdx) + pattern_block_start*stride;
                 double *clP = getClsForNode(idx   ) + pattern_block_start*stride;
                 for (size_t c=pattern_block_start; c<pattern_block_end; c++)
-                {
-					for (int k=0; k<numGammaCats; k++)
                     {
+					for (int k=0; k<numGammaCats; k++)
+                        {
                             
                         __m128d clL_01 = _mm_load_pd(clL);
                         __m128d clL_23 = _mm_load_pd(clL+2);
@@ -577,104 +567,103 @@ double Chunk::lnLikelihood(bool storeScore) {
                         clL += 4;
                         clR += 4;
                         
+                        }
                     }
                 }
-            }
             
 				
 			/* scale */
 #			if 1
             double *clP = getClsForNode( p->getIndex() ) + pattern_block_start*stride;
             for (size_t c=pattern_block_start; c<pattern_block_end; c++)
-            {
+                {
 				double maxVal = 0.0;
 				for (int i=0; i<stride; i++)
-                {
-					if (clP[i] > maxVal)
                     {
+					if (clP[i] > maxVal)
+                        {
 						maxVal = clP[i];
+                        }
                     }
-                }
 				double scaler = 1.0 / maxVal;
 				for (int i=0; i<stride; i++)
-                {
+                    {
 					clP[i] *= scaler;
-                }
+                    }
 				lnScaler[c] += log(maxVal);
 				clP += stride;
-            }
+                }
 #			endif
 						
         }
     }
 		
 	/* calculate likelihood */
-	Node *p = treePtr->getRoot()->getLft();
+	Node* p = treePtr->getRoot()->getLft();
 	std::vector<double> f = modelPtr->findBaseFreqs(subsetId)->getFreq();
 	double catProb = 1.0 / numGammaCats;
 	double *clP = getClsForNode( p->getIndex() ) + pattern_block_start*stride;
     double lnL = 0.0;
     for (size_t c=pattern_block_start; c<pattern_block_end; c++)
-    {
+        {
 		double like = 0.0;
 		for (int k=0; k<numGammaCats; k++)
-        {
-			for (int i=0; i<4; i++)
             {
+			for (int i=0; i<4; i++)
+                {
 				like += clP[i] * f[i] * catProb;
-            }
+                }
             clP += 4;
-        }
+            }
         lnL += (log( like ) + lnScaler[c]) * patternCounts[c];
-    }
+        }
 		
     delete [] lnScaler;
     
-#ifdef AP_MPI
-//    std::cerr << "Before: lnL[pid=" << pid << "] = " << lnL << std::endl;
+#   ifdef AP_MPI
+    // std::cerr << "Before: lnL[pid=" << pid << "] = " << lnL << std::endl;
     
     MPI::COMM_WORLD.Barrier();
     
     if ( pid != 0 )
-    {
+        {
         // send from the workers the log-likelihood to the master
         MPI::COMM_WORLD.Send(&lnL, 1, MPI::DOUBLE, 0, 0);
-    }
+        }
     
     if ( pid == 0 )
-    {
-        for (size_t i=1; i<numProcesses; ++i)
         {
+        for (size_t i=1; i<numProcesses; ++i)
+            {
             double tmp = 0;
             MPI::COMM_WORLD.Recv(&tmp, 1, MPI::DOUBLE, (int)i, 0);
             lnL += tmp;
+            }
         }
-    }
     
     MPI::COMM_WORLD.Barrier();
-    
-//    MPI::COMM_WORLD.Bcast(&lnL, 1, MPI::DOUBLE, 0);
+    // MPI::COMM_WORLD.Bcast(&lnL, 1, MPI::DOUBLE, 0);
     
     if ( pid == 0 )
-    {
-        for (size_t i=1; i<numProcesses; ++i)
         {
+        for (size_t i=1; i<numProcesses; ++i)
+            {
             MPI::COMM_WORLD.Send(&lnL, 1, MPI::DOUBLE, (int)i, 0);
+            }
         }
-    }
     else
-    {
+        {
         MPI::COMM_WORLD.Recv(&lnL, 1, MPI::DOUBLE, 0, 0);
-    }
+        }
     
     MPI::COMM_WORLD.Barrier();
-//    std::cerr << "After: lnL[pid=" << pid << "] = " << lnL << std::endl;
+    // std::cerr << "After: lnL[pid=" << pid << "] = " << lnL << std::endl;
 
 #endif
 	
-//    std::cerr << "lnL[" << subsetId << "] = " << lnL << std::endl;
-//    std::cerr << "\nExpected:\n" << "lnL[" << subsetId << "] = " << -1490.98 << std::endl;
-//    std::exit(0);
+    // std::cerr << "lnL[" << subsetId << "] = " << lnL << std::endl;
+    // std::cerr << "\nExpected:\n" << "lnL[" << subsetId << "] = " << -1490.98 << std::endl;
+    // std::exit(0);
 
     
     if (storeScore == true)
@@ -716,70 +705,69 @@ double Chunk::lnLikelihood(bool storeScore) {
  |        N - ?       15           1111
  |
  -------------------------------------------------------------------*/
-std::string Chunk::nucAsStringValue(int nucCode)
-{
+std::string Chunk::nucAsStringValue(int nucCode) {
+
     std::string nucString = "-";
     if (nucCode == 1)
-    {
+        {
         nucString = "A";
-    }
+        }
     else if (nucCode == 2)
-    {
+        {
         nucString = "C";
-    }
+        }
     else if (nucCode == 3)
-    {
+        {
         nucString = "M";
-    }
+        }
     else if (nucCode == 4)
-    {
+        {
         nucString = "G";
-    }
+        }
     else if (nucCode == 5)
-    {
+        {
         nucString = "R";
-    }
+        }
     else if (nucCode == 6)
-    {
+        {
         nucString = "S";
-    }
+        }
     else if (nucCode == 7)
-    {
+        {
         nucString = "V";
-    }
+        }
     else if (nucCode == 8)
-    {
+        {
         nucString = "T";
-    }
+        }
     else if (nucCode == 9)
-    {
+        {
         nucString = "W";
-    }
+        }
     else if (nucCode == 10)
-    {
+        {
         nucString = "Y";
-    }
+        }
     else if (nucCode == 11)
-    {
+        {
         nucString = "H";
-    }
+        }
     else if (nucCode == 12)
-    {
+        {
         nucString = "K";
-    }
+        }
     else if (nucCode == 13)
-    {
+        {
         nucString = "D";
-    }
+        }
     else if (nucCode == 14)
-    {
+        {
         nucString = "B";
-    }
+        }
     else if (nucCode == 15)
-    {
+        {
         nucString = "-";
-    }
-    
+        }
     return nucString;
 }
 
@@ -846,8 +834,8 @@ void Chunk::updateTransitionProbabilities(void) {
 	// update the transition probabilities
 	for (int n=0; n<treePtr->getNumNodes(); n++)
 		{
-		Node *p = treePtr->getDownPassNode( n );
-		if ( p->getAnc() != NULL )
+		Node* p = treePtr->getDownPassNode( n );
+		if ( p->getAnc() != nullptr )
 			{
 			int idx = p->getIndex();
 			double prop = p->getP();

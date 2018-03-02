@@ -93,63 +93,59 @@
 template <class T> 
 class MbMatrix { 
  
-public: 
-                            MbMatrix(void);                                   //!< null constructor (0 X 0 matrix) 
-                            MbMatrix(int m, int n);                           //!< creates a m X n matrix without initialization 
-                            MbMatrix(int m, int n,  T *a);                    //!< creates a m X n matrix as a view of a one-dimensional array 
-                            MbMatrix(int m, int n, const T &a);               //!< creates a m X n matrix initializing all elements to a constant 
-                   inline   MbMatrix(const MbMatrix &A);                      //!< creates a m X n matrix with elements shared by another matrix, A 
-                            ~MbMatrix(void);                                  //!< destructor 
- 
-							operator T**() { return &(v[0]); }                //!< type cast operator
-							operator const T**() { return &(v[0]); }          //!< type cast operator for const
-          inline MbMatrix   &operator=(const T &a);                           //!< assignment operator (all elements have the value a) 
-		         MbMatrix   &operator=(const MbMatrix &A) { return ref(A); }  //!< assignment operator (shallow copy, elements share data) 
-                     bool   operator==(const MbMatrix &A) const;              //!< equality operator 
-                        T   *operator[](int i) { return v[i]; }               //!< indexing operator (allows reference of data using [][] notation) 
-                  const T   *operator[](int i) const { return v[i]; }         //!< indexing operator (allows reference of data using [][] notation)
-		  inline MbMatrix   &ref(const MbMatrix &A);                          //!< creates a reference to another matrix (shallow copy) 
-                 MbMatrix   copy(void) const;                                 //!< creates a copy of another matrix (deep copy, with separate data elements) 
-                 MbMatrix   &inject(const MbMatrix &A);                       //!< copy the values of elements from one matrix to another 
-                      int   dim1(void) const { return m; }                    //!< number of rows 
-                      int   dim2(void) const { return n; }                    //!< number of columns 
-					  int   getRefCount(void) const { return *refCount; }     //!< get the number of matrices that share the same data 
-                      T**   expose(void) { return v; }                        //!< expose the raw data in the matrix, something that is useful in some applications, such as threading
-	private: 
-                        T   **v; 
-                      int   m; 
-                      int   n; 
-                      int   *refCount; 
-                     bool   cArray; 
- 
-                     void   destroy(void); 
- 
+    public:
+                            MbMatrix(void);                                   //!< null constructor (0 X 0 matrix)
+                            MbMatrix(int m, int n);                           //!< creates a m X n matrix without initialization
+                            MbMatrix(int m, int n, T* a);                     //!< creates a m X n matrix as a view of a one-dimensional array
+                            MbMatrix(int m, int n, const T& a);               //!< creates a m X n matrix initializing all elements to a constant
+        inline              MbMatrix(const MbMatrix& A);                      //!< creates a m X n matrix with elements shared by another matrix, A
+                           ~MbMatrix(void);                                   //!< destructor
+
+                            operator T**() { return &(v[0]); }                //!< type cast operator
+                            operator const T**() { return &(v[0]); }          //!< type cast operator for const
+        inline MbMatrix&    operator=(const T& a);                            //!< assignment operator (all elements have the value a)
+        MbMatrix&           operator=(const MbMatrix& A) { return ref(A); }   //!< assignment operator (shallow copy, elements share data)
+        bool                operator==(const MbMatrix& A) const;              //!< equality operator
+        T*                  operator[](int i) { return v[i]; }                //!< indexing operator (allows reference of data using [][] notation)
+        const T*            operator[](int i) const { return v[i]; }          //!< indexing operator (allows reference of data using [][] notation)
+        inline MbMatrix&    ref(const MbMatrix& A);                           //!< creates a reference to another matrix (shallow copy)
+        MbMatrix            copy(void) const;                                 //!< creates a copy of another matrix (deep copy, with separate data elements)
+        MbMatrix&           inject(const MbMatrix& A);                        //!< copy the values of elements from one matrix to another
+        int                 dim1(void) const { return m; }                    //!< number of rows
+        int                 dim2(void) const { return n; }                    //!< number of columns
+        int                 getRefCount(void) const { return *refCount; }     //!< get the number of matrices that share the same data
+        T**                 expose(void) { return v; }                        //!< expose the raw data in the matrix, something that is useful in some applications, such as threading
+    
+    private:
+        T**                 v;
+        int                 m;
+        int                 n;
+        int*                refCount;
+        bool                cArray;
+        void                destroy(void);
 }; 
- 
 
-template <class T> std::ostream& operator<<(std::ostream &s, const MbMatrix<T> &A);  //!< operator << 
-template <class T> std::istream& operator>>(std::istream &s, MbMatrix<T> &A);        //!< operator >> 
-
-template <class T> MbMatrix<T> operator+(const MbMatrix<T> &A, const MbMatrix<T> &B);     //!< operator + 
-template <class T> MbMatrix<T> operator-(const MbMatrix<T> &A, const MbMatrix<T> &B);     //!< operator - 
-template <class T> MbMatrix<T> operator*(const MbMatrix<T> &A, const MbMatrix<T> &B);     //!< operator * (matrix multiplication) 
-template <class T> MbMatrix<T> &operator+=(const MbMatrix<T> &A, const MbMatrix<T> &B);   //!< operator += 
-template <class T> MbMatrix<T> &operator-=(const MbMatrix<T> &A, const MbMatrix<T> &B);   //!< operator -= 
-template <class T> MbMatrix<T> &operator*=(const MbMatrix<T> &A, const MbMatrix<T> &B);   //!< operator *= (matrix multiplication)
-template <class T> MbMatrix<T> operator+(const T &a, const MbMatrix<T> &B);               //!< operator + for scalar + matrix 
-template <class T> MbMatrix<T> operator-(const T &a, const MbMatrix<T> &B);               //!< operator - for scalar - matrix 
-template <class T> MbMatrix<T> operator*(const T &a, const MbMatrix<T> &B);               //!< operator * for scalar * matrix 
-template <class T> MbMatrix<T> operator/(const T &a, const MbMatrix<T> &B);               //!< operator / for scalar / matrix 
-template <class T> MbMatrix<T> operator+(const MbMatrix<T> &A, const T &b);               //!< operator + for matrix + scalar 
-template <class T> MbMatrix<T> operator-(const MbMatrix<T> &A, const T &b);               //!< operator - for matrix - scalar 
-template <class T> MbMatrix<T> operator*(const MbMatrix<T> &A, const T &b);               //!< operator * for matrix * scalar 
-template <class T> MbMatrix<T> operator/(const MbMatrix<T> &A, const T &b);               //!< operator / for matrix / scalar 
-template <class T> MbMatrix<T> &operator+=(const MbMatrix<T> &A, const T &b);             //!< operator += for scalar 
-template <class T> MbMatrix<T> &operator-=(const MbMatrix<T> &A, const T &b);             //!< operator -= for scalar 
-template <class T> MbMatrix<T> &operator*=(const MbMatrix<T> &A, const T &b);             //!< operator *= for scalar 
-template <class T> MbMatrix<T> &operator/=(const MbMatrix<T> &A, const T &b);             //!< operator /= for scalar 
-
-template <class T> bool        operator!=(const MbMatrix<T> &A, const MbMatrix<T> &B);   //!< inequality (operator !=) 
+template <class T> std::ostream& operator<<(std::ostream& s, const MbMatrix<T>& A);       //!< operator <<
+template <class T> std::istream& operator>>(std::istream& s, MbMatrix<T>& A);             //!< operator >>
+template <class T> MbMatrix<T>   operator+(const MbMatrix<T>& A, const MbMatrix<T>& B);   //!< operator +
+template <class T> MbMatrix<T>   operator-(const MbMatrix<T>& A, const MbMatrix<T>& B);   //!< operator -
+template <class T> MbMatrix<T>   operator*(const MbMatrix<T>& A, const MbMatrix<T>& B);   //!< operator * (matrix multiplication)
+template <class T> MbMatrix<T>&  operator+=(const MbMatrix<T>& A, const MbMatrix<T>& B);  //!< operator +=
+template <class T> MbMatrix<T>&  operator-=(const MbMatrix<T>& A, const MbMatrix<T>& B);  //!< operator -=
+template <class T> MbMatrix<T>&  operator*=(const MbMatrix<T>& A, const MbMatrix<T>& B);  //!< operator *= (matrix multiplication)
+template <class T> MbMatrix<T>   operator+(const T& a, const MbMatrix<T>& B);             //!< operator + for scalar + matrix
+template <class T> MbMatrix<T>   operator-(const T& a, const MbMatrix<T>& B);             //!< operator - for scalar - matrix
+template <class T> MbMatrix<T>   operator*(const T& a, const MbMatrix<T>& B);             //!< operator * for scalar * matrix
+template <class T> MbMatrix<T>   operator/(const T& a, const MbMatrix<T>& B);             //!< operator / for scalar / matrix
+template <class T> MbMatrix<T>   operator+(const MbMatrix<T>& A, const T& b);             //!< operator + for matrix + scalar
+template <class T> MbMatrix<T>   operator-(const MbMatrix<T>& A, const T& b);             //!< operator - for matrix - scalar
+template <class T> MbMatrix<T>   operator*(const MbMatrix<T>& A, const T& b);             //!< operator * for matrix * scalar
+template <class T> MbMatrix<T>   operator/(const MbMatrix<T>& A, const T& b);             //!< operator / for matrix / scalar
+template <class T> MbMatrix<T>&  operator+=(const MbMatrix<T>& A, const T& b);            //!< operator += for scalar
+template <class T> MbMatrix<T>&  operator-=(const MbMatrix<T>& A, const T& b);            //!< operator -= for scalar
+template <class T> MbMatrix<T>&  operator*=(const MbMatrix<T>& A, const T& b);            //!< operator *= for scalar
+template <class T> MbMatrix<T>&  operator/=(const MbMatrix<T>& A, const T& b);            //!< operator /= for scalar
+template <class T> bool          operator!=(const MbMatrix<T>& A, const MbMatrix<T>& B);  //!< inequality (operator !=)
 
 // Definitions of inlined member functions
 
@@ -166,7 +162,7 @@ template <class T> bool        operator!=(const MbMatrix<T> &A, const MbMatrix<T
  * \param A Matrix to copy
  */
 template <class T>
-inline MbMatrix<T>::MbMatrix(const MbMatrix &A)
+inline MbMatrix<T>::MbMatrix(const MbMatrix& A)
     : v(A.v), m(A.m), n(A.n), refCount(A.refCount), cArray(A.cArray) {
 
 	(*refCount)++;
@@ -181,14 +177,13 @@ inline MbMatrix<T>::MbMatrix(const MbMatrix &A)
  * \return Assigned matrix
  */
 template <class T>
-inline MbMatrix<T> &MbMatrix<T>::operator=(const T &a) {
+inline MbMatrix<T>& MbMatrix<T>::operator=(const T& a) {
 
-	T *p = &(v[0][0]);
-	T *end = p + m*n;
+	T* p = &(v[0][0]);
+	T* end = p + m*n;
 	for (; p<end; p++)
-		*p = a;
-	return *this;
-
+		(*p) = a;
+	return (*this);
 }
 
 /*!
@@ -206,7 +201,7 @@ inline MbMatrix<T> &MbMatrix<T>::operator=(const T &a) {
  * \return Matrix to which the reference was assigned
  */
 template <class T>
-inline MbMatrix<T> &MbMatrix<T>::ref(const MbMatrix &A) {
+inline MbMatrix<T>& MbMatrix<T>::ref(const MbMatrix& A) {
 
 	if (this != &A)
 		{
@@ -220,8 +215,7 @@ inline MbMatrix<T> &MbMatrix<T>::ref(const MbMatrix &A) {
 		cArray = A.cArray;
         (*refCount)++;
 		}
-	return *this;
-	
+	return (*this);
 }
 
 
@@ -262,17 +256,19 @@ template <class T>
 MbMatrix<T>::MbMatrix(int m, int n)
     : v(0), m(0), n(0), refCount(0), cArray(false) {
 
-	if (m > 0 && n > 0) {
+	if (m > 0 && n > 0)
+        {
 		// allocate and initialize pointers
-		T *p = new T[m * n];
+		T* p = new T[m * n];
 		v = new T*[m];
-		for (int i=0; i<m; i++) {
+		for (int i=0; i<m; i++)
+            {
 			v[i] = p;
 			p += n;
-		}
+		    }
 		this->m = m;
 		this->n = n;
-	}    
+	    }
 	refCount = new int;
 	*refCount = 1;
 }
@@ -291,20 +287,22 @@ MbMatrix<T>::MbMatrix(int m, int n)
  * \param a Pointer to C array used as data storage
  */
 template <class T>
-MbMatrix<T>::MbMatrix(int m, int n, T *a)
+MbMatrix<T>::MbMatrix(int m, int n, T* a)
     : v(0), m(0), n(0) , refCount(0), cArray(false) {
 
-	if (m > 0 && n > 0) {
+	if (m > 0 && n > 0)
+        {
 		// initialize pointers
-		T *p = a;
+		T* p = a;
 		v = new T*[m];
-		for (int i=0; i<m; i++) {
+		for (int i=0; i<m; i++)
+            {
 			v[i] = p;
 			p += n;
-		}
+		    }
 		this->m = m;
 		this->n = n;
-	}
+	    }
 	refCount = new int;
 	*refCount = 1;
 	cArray = true;
@@ -321,24 +319,26 @@ MbMatrix<T>::MbMatrix(int m, int n, T *a)
  * \param a Value for initialization.
  */
 template <class T>
-MbMatrix<T>::MbMatrix(int m, int n, const T &a)
+MbMatrix<T>::MbMatrix(int m, int n, const T& a)
     : v(0), m(0), n(0), refCount(0), cArray(false) {
 
-	if (m > 0 && n > 0) {
+	if (m > 0 && n > 0)
+        {
 		// allocate and initialize pointers
-		T *p = new T[m * n];
+		T* p = new T[m * n];
 		v = new T*[m];
-		for (int i=0; i<m; i++) {
+		for (int i=0; i<m; i++)
+            {
 			v[i] = p;
 			p += n;
-		}
+		    }
 		this->m = m;
 		this->n = n;
 		// set values
 		T *end = &(v[0][0]) + m*n;
 		for (p=&(v[0][0]); p<end; p++)
 			*p = a;
-	}
+	    }
 	refCount = new int;
 	*refCount = 1;
 }
@@ -358,7 +358,6 @@ MbMatrix<T>::~MbMatrix(void) {
 	(*refCount)--;
 	if (*refCount < 1)
 		destroy();
-
 }
 
 /*!
@@ -376,17 +375,17 @@ MbMatrix<T>::~MbMatrix(void) {
  * \return True if (*this)==A, false otherwise.
  */
 template <class T>
-bool MbMatrix<T>::operator==(const MbMatrix &A) const {
+bool MbMatrix<T>::operator==(const MbMatrix& A) const {
 
 	if (m != A.m || n != A.n)
 		return false;
-	for (int i=0; i<m; i++) {
+	for (int i=0; i<m; i++)
+        {
 		for (int j=0; j<n; j++)
 			if (v[i][j] != A.v[i][j])
 				return false;
-	}
+	    }
 	return true;
-
 }
 
 /*!
@@ -403,7 +402,6 @@ MbMatrix<T> MbMatrix<T>::copy(void) const {
 	MbMatrix A(m, n);
 	memcpy (&(A.v[0][0]), &(v[0][0]), m*n*sizeof(T));
 	return A;
-
 }
 
 /*
@@ -432,12 +430,11 @@ MbMatrix<T> MbMatrix<T>::copy(void) const {
  * \return Injected matrix
  */
 template <class T>
-MbMatrix<T> &MbMatrix<T>::inject(const MbMatrix &A) {
+MbMatrix<T>& MbMatrix<T>::inject(const MbMatrix& A) {
 
 	if (A.m == m && A.n == n)
 		memcpy(&(v[0][0]), &(A.v[0][0]), m*n*sizeof(T));
 	return *this;
-	
 }
 
 /*!
@@ -450,13 +447,14 @@ MbMatrix<T> &MbMatrix<T>::inject(const MbMatrix &A) {
 template <class T>
 void MbMatrix<T>::destroy(void) {
 
-	if (v != 0) {
+	if (v != 0)
+        {
 		if (cArray == false) 
 			{
 			delete [] (v[0]);
 			}
 		delete [] (v);
-	}
+	    }
 	if (refCount != 0)
 		{
 		delete refCount;
@@ -481,27 +479,28 @@ void MbMatrix<T>::destroy(void) {
  * \return ostream object (for additional printing)
  */
 template <class T>
-std::ostream& operator<<(std::ostream &s, const MbMatrix<T> &A) {
+std::ostream& operator<<(std::ostream& s, const MbMatrix<T>& A) {
 
 	int M = A.dim1();
 	int N = A.dim2();
 	s << "[" << M << "," << N << "]\n";
 	s << "(";
-	for (int i=0; i<M; i++) {
+	for (int i=0; i<M; i++)
+        {
 		s << "(";
-		for (int j=0; j<N; j++) {
+		for (int j=0; j<N; j++)
+            {
 			s << A[i][j];
 			if (j != N-1)
 				s << ",";
-		}
+		    }
 		if (i != M-1)
 			s << "),\n";
 		else
 			s << ")";
-	}
+	    }
 	s << ")";
 	return s;
-	
 }
 
 /*!
@@ -519,7 +518,7 @@ std::ostream& operator<<(std::ostream &s, const MbMatrix<T> &A) {
  * \return istream object (for additional reading)
  */
 template <class T>
-std::istream& operator>>(std::istream &s, MbMatrix<T> &A) {
+std::istream& operator>>(std::istream& s, MbMatrix<T>& A) {
 
 	A = MbMatrix<T>();	// make sure we return null matrix on failure
 	int M, N;
@@ -540,29 +539,31 @@ std::istream& operator>>(std::istream &s, MbMatrix<T> &A) {
 	s >> c;
 	if (c != '(')
 		return s;
-	for (int i=0; i<M; i++) {
+	for (int i=0; i<M; i++)
+        {
 		s >> c;
 		if (c != '(')
 			return s;
-		for (int j=0; j<N; j++) {
+		for (int j=0; j<N; j++)
+            {
 			s >> B[i][j];
-			if (j < N-1) {
+			if (j < N-1)
+                {
 				s >> c;
 				if (c != ',') return s;
-			}
-		}
+			    }
+		    }
 		s >> c;
 		if (c != ')')
 			return s;
 		if (i != M-1)
 			s.ignore();  // ignore newline
-	}
+	    }
 	s >> c;
 	if (c != ')')
 		return s;
 	A = B;
 	return s;
-
 }
 
 /*!
@@ -576,14 +577,13 @@ std::istream& operator>>(std::istream &s, MbMatrix<T> &A) {
  * \return A + b
  */
 template <class T>
-MbMatrix<T> operator+(const MbMatrix<T> &A, const T &b) {
+MbMatrix<T> operator+(const MbMatrix<T>& A, const T& b) {
 
 	MbMatrix<T> B(A.copy());
 	for (int i=0; i<B.dim1(); i++)
 		for (int j=0; j<B.dim2(); j++)
 			B[i][j] = A[i][j] + b;
 	return B;
-
 }
 
 /*!
@@ -597,14 +597,13 @@ MbMatrix<T> operator+(const MbMatrix<T> &A, const T &b) {
  * \return A - b
  */
 template <class T>
-MbMatrix<T> operator-(const MbMatrix<T> &A, const T &b) {
+MbMatrix<T> operator-(const MbMatrix<T>& A, const T& b) {
 
 	MbMatrix<T> B(A.copy());
 	for (int i=0; i<B.dim1(); i++)
 		for (int j=0; j<B.dim2(); j++)
 			B[i][j] = A[i][j] - b;
 	return B;
-
 }
 
 /*!
@@ -618,14 +617,13 @@ MbMatrix<T> operator-(const MbMatrix<T> &A, const T &b) {
  * \return A * b
  */
 template <class T>
-MbMatrix<T> operator*(const MbMatrix<T> &A, const T &b) {
+MbMatrix<T> operator*(const MbMatrix<T>& A, const T& b) {
 
 	MbMatrix<T> B(A.copy());
 	for (int i=0; i<B.dim1(); i++)
 		for (int j=0; j<B.dim2(); j++)
 			B[i][j] = A[i][j] * b;
 	return B;
-
 }
 
 /*!
@@ -639,14 +637,13 @@ MbMatrix<T> operator*(const MbMatrix<T> &A, const T &b) {
  * \return A / b
  */
 template <class T>
-MbMatrix<T> operator/(const MbMatrix<T> &A, const T &b) {
+MbMatrix<T> operator/(const MbMatrix<T>& A, const T& b) {
 
 	MbMatrix<T> B(A.copy());
 	for (int i=0; i<B.dim1(); i++)
 		for (int j=0; j<B.dim2(); j++)
 			B[i][j] = A[i][j] / b;
 	return B;
-
 }
 
 /*!
@@ -660,14 +657,13 @@ MbMatrix<T> operator/(const MbMatrix<T> &A, const T &b) {
  * \return a + B
  */
 template <class T>
-MbMatrix<T> operator+(const T &a, const MbMatrix<T> &B) {
+MbMatrix<T> operator+(const T& a, const MbMatrix<T>& B) {
 
 	MbMatrix<T> A(B.copy());
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] = a + B[i][j];
 	return A;
-
 }
 
 /*!
@@ -681,14 +677,13 @@ MbMatrix<T> operator+(const T &a, const MbMatrix<T> &B) {
  * \return a - B
  */
 template <class T>
-MbMatrix<T> operator-(const T &a, const MbMatrix<T> &B) {
+MbMatrix<T> operator-(const T& a, const MbMatrix<T>& B) {
 
 	MbMatrix<T> A(B.copy());
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] = a - B[i][j];
 	return A;
-
 }
 
 /*!
@@ -702,14 +697,13 @@ MbMatrix<T> operator-(const T &a, const MbMatrix<T> &B) {
  * \return a * B
  */
 template <class T>
-MbMatrix<T> operator*(const T &a, const MbMatrix<T> &B) {
+MbMatrix<T> operator*(const T& a, const MbMatrix<T>& B) {
 
 	MbMatrix<T> A(B.copy());
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] = a * B[i][j];
 	return A;
-
 }
 
 /*!
@@ -723,14 +717,13 @@ MbMatrix<T> operator*(const T &a, const MbMatrix<T> &B) {
  * \return a / B
  */
 template <class T>
-MbMatrix<T> operator/(const T &a, const MbMatrix<T> &B) {
+MbMatrix<T> operator/(const T& a, const MbMatrix<T>& B) {
 
 	MbMatrix<T> A(B.copy());
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] = a / B[i][j];
 	return A;
-
 }
 
 /*!
@@ -744,13 +737,12 @@ MbMatrix<T> operator/(const T &a, const MbMatrix<T> &B) {
  * \return A += b
  */
 template <class T>
-MbMatrix<T> &operator+=(MbMatrix<T> &A, const T &b) {
+MbMatrix<T>& operator+=(MbMatrix<T>& A, const T& b) {
 
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] += b;
 	return A;
-
 }
 
 /*!
@@ -764,13 +756,12 @@ MbMatrix<T> &operator+=(MbMatrix<T> &A, const T &b) {
  * \return A -= b
  */
 template <class T>
-MbMatrix<T> &operator-=(MbMatrix<T> &A, const T &b) {
+MbMatrix<T>& operator-=(MbMatrix<T>& A, const T& b) {
 
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] -= b;
 	return A;
-
 }
 
 /*!
@@ -784,13 +775,12 @@ MbMatrix<T> &operator-=(MbMatrix<T> &A, const T &b) {
  * \return A *= b
  */
 template <class T>
-MbMatrix<T> &operator*=(MbMatrix<T> &A, const T &b) {
+MbMatrix<T>& operator*=(MbMatrix<T>& A, const T& b) {
 
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] *= b;
 	return A;
-
 }
 
 /*!
@@ -804,13 +794,12 @@ MbMatrix<T> &operator*=(MbMatrix<T> &A, const T &b) {
  * \return A /= b
  */
 template <class T>
-MbMatrix<T> &operator/=(MbMatrix<T> &A, const T &b) {
+MbMatrix<T>& operator/=(MbMatrix<T>& A, const T& b) {
 
 	for (int i=0; i<A.dim1(); i++)
 		for (int j=0; j<A.dim2(); j++)
 			A[i][j] /= b;
 	return A;
-
 }
 
 /*!
@@ -824,21 +813,22 @@ MbMatrix<T> &operator/=(MbMatrix<T> &A, const T &b) {
  * \return A + B, null matrix on failure
  */
 template <class T>
-MbMatrix<T> operator+(const MbMatrix<T> &A, const MbMatrix<T> &B) {
+MbMatrix<T> operator+(const MbMatrix<T>& A, const MbMatrix<T>& B) {
 
 	int m = A.dim1();
 	int n = A.dim2();
 	if (B.dim1() != m ||  B.dim2() != n)
 		return MbMatrix<T>();
-	else {
+	else
+        {
 		MbMatrix<T> C(m,n);
-		for (int i=0; i<m; i++) {
+		for (int i=0; i<m; i++)
+            {
 			for (int j=0; j<n; j++)
 				C[i][j] = A[i][j] + B[i][j];
-		}
+		    }
 		return C;
-	}
-
+	    }
 }
 
 /*!
@@ -852,21 +842,22 @@ MbMatrix<T> operator+(const MbMatrix<T> &A, const MbMatrix<T> &B) {
  * \return A - B, null matrix on failure
  */
 template <class T>
-MbMatrix<T> operator-(const MbMatrix<T> &A, const MbMatrix<T> &B) {
+MbMatrix<T> operator-(const MbMatrix<T>& A, const MbMatrix<T>& B) {
 
 	int m = A.dim1();
 	int n = A.dim2();
 	if (B.dim1() != m ||  B.dim2() != n)
 		return MbMatrix<T>();
-	else {
+	else
+        {
 		MbMatrix<T> C(m,n);
-		for (int i=0; i<m; i++) {
+		for (int i=0; i<m; i++)
+            {
 			for (int j=0; j<n; j++)
 				C[i][j] = A[i][j] - B[i][j];
-		}
+		    }
 		return C;
-	}
-
+	    }
 }
 
 /*!
@@ -884,7 +875,7 @@ MbMatrix<T> operator-(const MbMatrix<T> &A, const MbMatrix<T> &B) {
  * \return A * B, an (m X k) matrix, or null matrix on failure
  */
 template <class T>
-MbMatrix<T> operator*(const MbMatrix<T> &A, const MbMatrix<T> &B) {
+MbMatrix<T> operator*(const MbMatrix<T>& A, const MbMatrix<T>& B) {
 
 	if ( A.dim2() != B.dim1() )
 		return MbMatrix<T>();
@@ -892,16 +883,17 @@ MbMatrix<T> operator*(const MbMatrix<T> &A, const MbMatrix<T> &B) {
 	int N = A.dim2();
 	int K = B.dim2();
 	MbMatrix<T> C(M,K);
-	for (int i=0; i<M; i++) {
-		for (int j=0; j<K; j++) {
+	for (int i=0; i<M; i++)
+        {
+		for (int j=0; j<K; j++)
+            {
 			T sum = 0;
 			for (int k=0; k<N; k++)
 				sum += A[i][k] * B [k][j];
 			C[i][j] = sum;
-		}
-	}
+		    }
+	    }
 	return C;
-
 }
 
 /*!
@@ -916,18 +908,19 @@ MbMatrix<T> operator*(const MbMatrix<T> &A, const MbMatrix<T> &B) {
  * \return A += B, A unmodified on failure
  */
 template <class T>
-MbMatrix<T>&  operator+=(MbMatrix<T> &A, const MbMatrix<T> &B) {
+MbMatrix<T>& operator+=(MbMatrix<T>& A, const MbMatrix<T>& B) {
 
 	int m = A.dim1();
 	int n = A.dim2();
-	if (B.dim1() == m && B.dim2() == n) {
-		for (int i=0; i<m; i++) {
+	if (B.dim1() == m && B.dim2() == n)
+        {
+		for (int i=0; i<m; i++)
+            {
 			for (int j=0; j<n; j++)
 				A[i][j] += B[i][j];
-		}
-	}
+		    }
+	    }
 	return A;
-
 }
 
 /*!
@@ -942,18 +935,19 @@ MbMatrix<T>&  operator+=(MbMatrix<T> &A, const MbMatrix<T> &B) {
  * \return A -= B, A unmodified on failure
  */
 template <class T>
-MbMatrix<T>&  operator-=(MbMatrix<T> &A, const MbMatrix<T> &B) {
+MbMatrix<T>& operator-=(MbMatrix<T>& A, const MbMatrix<T>& B) {
 
 	int m = A.dim1();
 	int n = A.dim2();
-	if (B.dim1() == m && B.dim2() == n) {
-		for (int i=0; i<m; i++) {
+	if (B.dim1() == m && B.dim2() == n)
+        {
+		for (int i=0; i<m; i++)
+            {
 			for (int j=0; j<n; j++)
 				A[i][j] -= B[i][j];
-		}
-	}
+		    }
+	    }
 	return A;
-
 }
 
 /*!
@@ -970,23 +964,25 @@ MbMatrix<T>&  operator-=(MbMatrix<T> &A, const MbMatrix<T> &B) {
  * \return A = A * B, an (n X n) matrix, or unmodified A on failure
  */
 template <class T>
-MbMatrix<T> &operator*=(MbMatrix<T> &A, const MbMatrix<T> &B) {
+MbMatrix<T>& operator*=(MbMatrix<T>& A, const MbMatrix<T>& B) {
 
-	if (A.dim1()==A.dim2() && B.dim1()==B.dim2() && A.dim1()==B.dim1()) {
+	if (A.dim1()==A.dim2() && B.dim1()==B.dim2() && A.dim1()==B.dim1())
+        {
 		int N = A.dim1();
 		MbMatrix<T> C(N,N);
-		for (int i=0; i<N; i++) {
-			for (int j=0; j<N; j++) {
+		for (int i=0; i<N; i++)
+            {
+			for (int j=0; j<N; j++)
+                {
 				T sum = 0;
 				for (int k=0; k<N; k++)
 					sum += A[i][k] * B [k][j];
 				C[i][j] = sum;
-			}
-		}
+			    }
+		    }
 		A = C;
-	}
+	    }
 	return A;
-
 }
 
 /*!
@@ -1002,13 +998,12 @@ MbMatrix<T> &operator*=(MbMatrix<T> &A, const MbMatrix<T> &B) {
  * \return True if A != B, false otherwise
  */
 template <class T>
-bool operator!=(const MbMatrix<T> &A, const MbMatrix<T> &B) {
+bool operator!=(const MbMatrix<T>& A, const MbMatrix<T>& B) {
 
 	if (A == B)
 		return false;
 	else
 		return true;
-
 }
 
 #endif

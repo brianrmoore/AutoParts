@@ -8,7 +8,7 @@
 
 
 
-Asrv::Asrv(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, int nc, double tn) : Parm(rp, mp, lg, nm) {
+Asrv::Asrv(MbRandom* rp, Model* mp, DualStream* lg, std::string nm, double lm, int nc, double tn) : Parm(rp, mp, lg, nm) {
 
 	lambda  = lm;
 	tuning  = tn;
@@ -16,31 +16,28 @@ Asrv::Asrv(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, i
 	numCats = nc;
 	r       = std::vector<double>( numCats );
 	ranPtr->discretizeGamma(r, alpha, alpha, numCats, false);
-	
 }
 
 Asrv::Asrv(Asrv &a) : Parm(a.ranPtr, a.modelPtr, a.outLog, a.parmName) {
 
 	r = std::vector<double>( a.numCats );
 	clone(a);
-		
 }
 
 Asrv::~Asrv(void) {
 
 }
 
-Asrv &Asrv::operator=(Asrv &a) {
+Asrv& Asrv::operator=(Asrv& a) {
 
 	if (this != &a)
 		{
 		Parm::operator=(a);
 		}
 	return *this;
-
 }
 
-void Asrv::clone(Asrv &a) {
+void Asrv::clone(Asrv& a) {
 
 	lambda = a.lambda;
 	tuning = a.tuning;
@@ -48,7 +45,6 @@ void Asrv::clone(Asrv &a) {
 	numCats = a.numCats;
 	for (int i=0; i<numCats; i++)
 		r[i] = a.r[i];
-		
 }
 
 std::string Asrv::getParmString(int n) {
@@ -57,7 +53,6 @@ std::string Asrv::getParmString(int n) {
 	sprintf(temp, "%lf\t", alpha);
 	std::string tempString = temp;
 	return tempString;
-	
 }
 
 std::string Asrv::getParmHeader(int n) {
@@ -74,13 +69,11 @@ std::string Asrv::getParmHeader(int n) {
 void Asrv::print(void) {
 
 	(*outLog) << "alpha = " << alpha << '\n';
-	
 }
 
 double Asrv::lnPriorProb(void) {
 
 	return ranPtr->lnExponentialPdf( lambda, alpha );
-	
 }
 
 double Asrv::update(void) {
@@ -90,5 +83,4 @@ double Asrv::update(void) {
 	alpha = newValue;
 	ranPtr->discretizeGamma(r, alpha, alpha, numCats, false);
 	return log(newValue) - log(oldValue);
-	
 }

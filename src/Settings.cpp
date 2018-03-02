@@ -5,7 +5,7 @@
 
 
 
-Settings::Settings(int argc, char *argv[]) {
+Settings::Settings(int argc, char* argv[]) {
 
 #	if 0
 	/* set up fake command-line argument string */
@@ -181,8 +181,7 @@ Settings::Settings(int argc, char *argv[]) {
 	else
 		{
 		printUsage();
-		}	
-
+		}
 }
 
 double Settings::getTuningParm(std::string parmNameStr) {
@@ -232,5 +231,4 @@ void Settings::printUsage(void) {
 	std::cout << "Example:" << std::endl;
 	std::cout << "   ./AutoParts -i <input file> -o <output file>" << std::endl;
 	exit(0);
-
 }

@@ -239,7 +239,6 @@ void MbEigensystem::balance(MbMatrix<double> &a, std::vector<double> &scale, int
  * \param low [in] Index to first nonzero row
  * \param high [in] Index to last nonzero row
  * \param scale [in] Vector of scalers from balance
- * \param eivec [out]Scaling data from balance
  */
 void MbEigensystem::balback(int low, int high, std::vector<double> &scale, MbMatrix<double> &eivec) {
 
@@ -525,14 +524,14 @@ void MbEigensystem::elmtrans(int low, int high, MbMatrix<double> &a, std::vector
  * Return the determinant
  *
  *\brief Return determinant
- *\param V_ Matrix for eigenvectors
  */
 double MbEigensystem::getDeterminant(void) {
 
 	double det = 1.0;
-	for (int i=0; i<n; i++) {
+	for (int i=0; i<n; i++)
+        {
 		det *= realEigenvalues[i];
-	}
+	    }
 	return (det);
 }
 

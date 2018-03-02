@@ -22,9 +22,9 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 
     
     pid = 0;
-#ifdef AP_MPI
+#   ifdef AP_MPI
     pid = MPI::COMM_WORLD.Get_rank();
-#endif
+#   endif
     
 	// remember some pointers that we will need
 	settingsPtr = sp;
@@ -36,13 +36,13 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 	std::string lnFileName = settingsPtr->getOutPutFileName() + ".ln";
     
     if ( pid == 0 )
-    {
+        {
         lnOut.open( lnFileName.c_str(), std::ios::out );
-    }
+        }
     
 	/* allocate information for the acceptance rates */
-	int *numAccepted = new int[2 * modelPtr->getNumRestaurants()];
-	int *numAttempted = numAccepted + modelPtr->getNumRestaurants();
+	int* numAccepted = new int[2 * modelPtr->getNumRestaurants()];
+	int* numAttempted = numAccepted + modelPtr->getNumRestaurants();
 	for (int i=0; i<modelPtr->getNumRestaurants(); i++)
 		numAccepted[i] = numAttempted[i] = 0;
         
@@ -52,12 +52,12 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 	/* run the Markov chain */
 	std::vector<double> mean(modelPtr->getNumRestaurants(), 0.0);
 	for (int n=1; n<=settingsPtr->getChainLength(); n++)
-    {
+        {
         
-//        seedType a;
-//        seedType b;
-//        ranPtr->getSeed(a,b);
-//        std::cerr << "Iteration=" << n << " -- PID=" << pid << ":\t\ta=" << a << " -- b="<< b << std::endl;
+        // seedType a;
+        // seedType b;
+        // ranPtr->getSeed(a,b);
+        // std::cerr << "Iteration=" << n << " -- PID=" << pid << ":\t\ta=" << a << " -- b="<< b << std::endl;
         
 		/* pick a parameter to change */
 		Restaurant* rest = modelPtr->getRestaurantToChange();
@@ -67,23 +67,23 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 		bool wasAccepted = rest->change();
         
         double newLnL = modelPtr->lnLikelihood();
-//        std::cerr << "Iteration=" << n << " -- PID=" << pid << ":\t\tlnL=" << newLnL << std::endl;
+        // std::cerr << "Iteration=" << n << " -- PID=" << pid << ":\t\tlnL=" << newLnL << std::endl;
 		
 		/* print information to the screen */
 		if ( n % settingsPtr->getPrintFrequency() == 0 )
-        {
+            {
 			log << std::setw(6) << n << " -- " << std::fixed << std::setprecision(3) << newLnL << " ";
 			for (int i=0; i<modelPtr->getNumRestaurants(); i++)
-            {
+                {
 				log << std::setw(2) << modelPtr->getRestaurant(i)->getNumTables() << " ";
-            }
+                }
             log << rest->getName();
 			log << '\n';
-        }
+            }
 		for (int i=0; i<modelPtr->getNumRestaurants(); i++)
-        {
+            {
             mean[i] += modelPtr->getRestaurant(i)->getNumTables();
-        }
+            }
         
 		/* remember the state of the chain */
 		if ( n % settingsPtr->getSampleFrequency() == 0)
@@ -92,18 +92,18 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 		/* update information on acceptances */
 		numAttempted[restaurantId]++;
 		if (wasAccepted == true)
-        {
+            {
 			numAccepted[restaurantId]++;
-        }
+            }
         
-    }
+        }
         
     if ( pid == 0 || !true )
-    {
-        for (int i=0; i<modelPtr->getNumRestaurants(); i++)
         {
+        for (int i=0; i<modelPtr->getNumRestaurants(); i++)
+            {
             log << i << " -- " << std::fixed << std::setprecision(4) << mean[i] / settingsPtr->getChainLength() << '\n';
-        }
+            }
         
 	/* print information on acceptances */
 	int longestName = 0;
@@ -136,40 +136,37 @@ Mcmc::Mcmc(Settings* sp, Model* mp, MbRandom* rp, DualStream& log) {
 			log << std::setw(5) << "N/A";
 		log << '\n';
 		}
-        
     }
 
-//    std::valarray<double> values( logLikes.size() );
-//    for (int i=0; i<values.size(); i++)
-//    values[i] = logLikes[i];
-//    double ml1 = aicm();
-//    double ml2 = marginalLikelihood();
-//    double ml3 = Pr_harmonic(values);
-//    double ml4 = Pr_smoothed(values);
-//    std::cout << "AICM                           = " << ml1 << std::endl;
-//    std::cout << "Harmonic mean (old way)        = " << ml2 << std::endl;
-//    std::cout << "Harmonic mean (Suchard)        = " << ml3 << std::endl;
-//    std::cout << "Marginal likelihood (smoothed) = " << ml4 << std::endl;
-//    
-//    // have every restaurant calculate a summary of its sampled partitions
-//    for (int i=0; i<modelPtr->getNumRestaurants(); i++)
-//    {
-//        modelPtr->getRestaurant(i)->summarizePartitions();
-//    }
+    //    std::valarray<double> values( logLikes.size() );
+    //    for (int i=0; i<values.size(); i++)
+    //    values[i] = logLikes[i];
+    //    double ml1 = aicm();
+    //    double ml2 = marginalLikelihood();
+    //    double ml3 = Pr_harmonic(values);
+    //    double ml4 = Pr_smoothed(values);
+    //    std::cout << "AICM                           = " << ml1 << std::endl;
+    //    std::cout << "Harmonic mean (old way)        = " << ml2 << std::endl;
+    //    std::cout << "Harmonic mean (Suchard)        = " << ml3 << std::endl;
+    //    std::cout << "Marginal likelihood (smoothed) = " << ml4 << std::endl;
+    //
+    //    // have every restaurant calculate a summary of its sampled partitions
+    //    for (int i=0; i<modelPtr->getNumRestaurants(); i++)
+    //    {
+    //        modelPtr->getRestaurant(i)->summarizePartitions();
+    //    }
     
     std::cerr << pid << " finished MCMC class." << std::endl;
 
-    
 	delete [] numAccepted;
 }
 
 Mcmc::~Mcmc(void) {
     
     if ( pid == 0)
-    {
+        {
         lnOut.close();
-    }
-    
+        }
 }
 
 //double Mcmc::aicm(void) {
@@ -348,17 +345,16 @@ Mcmc::~Mcmc(void) {
 void Mcmc::saveStates(int n, double lnL) {
     
     if ( pid == 0 )
-    {
-        if (n == 0)
         {
+        if (n == 0)
+            {
             lnOut << "Gen" << '\t' << "lnL" << std::endl;
-        }
+            }
         lnOut << n << '\t' << lnL << std::endl;
 	
         for (int i=0; i<modelPtr->getNumRestaurants(); i++)
-		{
+		    {
             modelPtr->getRestaurant(i)->saveState(n);
-		}
-	
-    }
+		    }
+        }
 }

@@ -10,7 +10,7 @@
 
 
 
-SubRates::SubRates(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double tn) : Parm(rp, mp, lg, nm) {
+SubRates::SubRates(MbRandom* rp, Model* mp, DualStream* lg, std::string nm, double tn) : Parm(rp, mp, lg, nm) {
 
 	alpha0 = tn;
 	r = std::vector<double>( 6 );
@@ -21,32 +21,29 @@ SubRates::SubRates(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, doub
 	normalizeRates(r, MIN_RATE, 1.0);	
 }
 
-SubRates::SubRates(SubRates &s) : Parm(s.ranPtr, s.modelPtr, s.outLog, s.parmName) {
+SubRates::SubRates(SubRates& s) : Parm(s.ranPtr, s.modelPtr, s.outLog, s.parmName) {
 
 	r = std::vector<double>( 6 );
 	a = std::vector<double>( 6 );
 	clone( s );
-
 }
 
 SubRates::~SubRates(void) {
 
 }
 
-SubRates &SubRates::operator=(SubRates &s) {
+SubRates& SubRates::operator=(SubRates& s) {
 
 	if (this != &s)
 		{
 		Parm::operator=(s);
 		}
 	return *this;
-
 }
 
 double SubRates::lnPriorProb(void) {
 
 	return ranPtr->lnDirichletPdf(a, r);
-	
 }
 
 std::string SubRates::getParmString(int n) {
@@ -55,7 +52,6 @@ std::string SubRates::getParmString(int n) {
 	sprintf(temp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t", r[0], r[1], r[2], r[3], r[4], r[5]);
 	std::string tempString = temp;
 	return tempString;
-	
 }
 
 std::string SubRates::getParmHeader(int n) {
@@ -175,7 +171,7 @@ double SubRates::update(void) {
 #endif
 }
 
-void SubRates::clone(SubRates &s) {
+void SubRates::clone(SubRates& s) {
 
 	alpha0 = s.alpha0;
 	for (int i=0; i<6; i++)
@@ -183,10 +179,9 @@ void SubRates::clone(SubRates &s) {
 		a[i] = 1.0;
 		r[i] = s.r[i];
 		}
-
 }
 
-double SubRates::normalizeRates(std::vector<double> &a, double minVal, double total) {
+double SubRates::normalizeRates(std::vector<double>& a, double minVal, double total) {
 
 	int n = (int)a.size();
 	double normalizeTo = total;

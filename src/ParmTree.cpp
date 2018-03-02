@@ -240,7 +240,7 @@ void Tree::buildTreeFromNewickDescription(std::string ts) {
 	
 	/* build up the tree, using the information stored in the parsed vector */
 	int nextInteriorNode = numTaxa;
-	Node *p;
+	Node* p = nullptr;
 	int n = 0;
 	double inputTreeLength = 0.0;
 	for (std::vector<std::string>::iterator t=parsedNewick.begin(); t != parsedNewick.end(); t++)
@@ -256,7 +256,7 @@ void Tree::buildTreeFromNewickDescription(std::string ts) {
 			else
 				{
 				Node *q = &nodes[nextInteriorNode++];
-				if (p->getLft() == NULL)
+				if (p->getLft() == nullptr)
 					{
 					p->setLft( q );
 					q->setAnc( p );

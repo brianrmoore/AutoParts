@@ -6,7 +6,7 @@
 
 
 #ifdef AP_MPI
-#include <mpi.h>
+#   include <mpi.h>
 #endif
 
 class DualStream {
@@ -16,12 +16,11 @@ class DualStream {
         template<class T>
         DualStream& operator<<(const T& x)
             {
-                
-                size_t pid = 0;
-#ifdef AP_MPI
-                pid = MPI::COMM_WORLD.Get_rank();
-#endif
-                if ( pid == 0 )
+            size_t pid = 0;
+#           ifdef AP_MPI
+            pid = MPI::COMM_WORLD.Get_rank();
+#           endif
+            if ( pid == 0 )
                 {
                     os1 << x;
                     os2 << x;

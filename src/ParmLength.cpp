@@ -6,7 +6,7 @@
 
 
 
-TreeLength::TreeLength(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, double lm, int nb, double tn) : Parm(rp, mp, lg, nm) {
+TreeLength::TreeLength(MbRandom* rp, Model* mp, DualStream* lg, std::string nm, double lm, int nb, double tn) : Parm(rp, mp, lg, nm) {
 
 	numBranches = nb;
 	lambda      = lm;
@@ -14,36 +14,33 @@ TreeLength::TreeLength(MbRandom *rp, Model *mp, DualStream* lg, std::string nm, 
 	length      = ranPtr->gammaRv( numBranches, lambda );
 }
 
-TreeLength::TreeLength(TreeLength &t) : Parm(t.ranPtr, t.modelPtr, t.outLog, t.parmName) {
+TreeLength::TreeLength(TreeLength& t) : Parm(t.ranPtr, t.modelPtr, t.outLog, t.parmName) {
 
 	numBranches = t.numBranches;
 	lambda      = t.lambda;
 	tuning      = t.tuning;
 	length      = t.length;
-	
 }
 
 TreeLength::~TreeLength(void) {
 
 }
 
-TreeLength &TreeLength::operator=(TreeLength &t) {
+TreeLength& TreeLength::operator=(TreeLength& t) {
 
 	if (this != &t)
 		{
 		Parm::operator=(t);
 		}
 	return *this;
-
 }
 
-void TreeLength::clone(TreeLength &t) {
+void TreeLength::clone(TreeLength& t) {
 
 	numBranches = t.numBranches;
 	lambda      = t.lambda;
 	tuning      = t.tuning;
 	length      = t.length;
-
 }
 
 std::string TreeLength::getParmString(int n) {
@@ -52,7 +49,6 @@ std::string TreeLength::getParmString(int n) {
 	sprintf(temp, "%lf\t", length);
 	std::string tempString = temp;
 	return tempString;
-	
 }
 
 std::string TreeLength::getParmHeader(int n) {
@@ -69,13 +65,11 @@ std::string TreeLength::getParmHeader(int n) {
 double TreeLength::lnPriorProb(void) {
 
 	return ranPtr->lnGammaPdf( numBranches, lambda, length );
-	
 }
 
 void TreeLength::print(void) {
 
 	(*outLog) << "Tree Length = " << length << '\n';
-	
 }
 
 double TreeLength::update(void) {
@@ -84,7 +78,6 @@ double TreeLength::update(void) {
 	double newValue = oldValue * exp( tuning*(ranPtr->uniformRv()-0.5) );
 	length = newValue;
 	return log(newValue) - log(oldValue);
-	
 }
 
 

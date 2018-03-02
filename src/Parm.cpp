@@ -10,7 +10,7 @@
 
 
 
-Parm::Parm(MbRandom *rp, Model *mp, DualStream* lg, std::string nm)  {
+Parm::Parm(MbRandom* rp, Model* mp, DualStream* lg, std::string nm)  {
 
 	ranPtr   = rp;
 	parmName = nm;
@@ -22,7 +22,7 @@ Parm::~Parm(void) {
 
 }
 
-Parm &Parm::operator=(Parm &b) {
+Parm& Parm::operator=(Parm& b) {
 
 	if (this != &b)
 		{
@@ -37,8 +37,8 @@ Parm &Parm::operator=(Parm &b) {
 		
 		/* check to see if the object is a substitution rate parameter */
 		{
-		SubRates *thatDerivedPtr = dynamic_cast<SubRates *>(&b);
-		SubRates *thisDerivedPtr = dynamic_cast<SubRates *>(this);
+		SubRates* thatDerivedPtr = dynamic_cast<SubRates *>(&b);
+		SubRates* thisDerivedPtr = dynamic_cast<SubRates *>(this);
 		if ( thatDerivedPtr != 0 && thisDerivedPtr != 0 )
 			{
 			thisDerivedPtr->clone( *thatDerivedPtr );
@@ -48,8 +48,8 @@ Parm &Parm::operator=(Parm &b) {
 
 		/* check to see if the object is a gamma shape parameter */
 		{
-		Asrv *thatDerivedPtr = dynamic_cast<Asrv *>(&b);
-		Asrv *thisDerivedPtr = dynamic_cast<Asrv *>(this);
+		Asrv* thatDerivedPtr = dynamic_cast<Asrv *>(&b);
+		Asrv* thisDerivedPtr = dynamic_cast<Asrv *>(this);
 		if ( thatDerivedPtr != 0 && thisDerivedPtr != 0 )
 			{
 			thisDerivedPtr->clone( *thatDerivedPtr );
@@ -59,8 +59,8 @@ Parm &Parm::operator=(Parm &b) {
 
 		/* check to see if the object is a base frequency parameter */
 		{
-		BaseFreqs *thatDerivedPtr = dynamic_cast<BaseFreqs *>(&b);
-		BaseFreqs *thisDerivedPtr = dynamic_cast<BaseFreqs *>(this);
+		BaseFreqs* thatDerivedPtr = dynamic_cast<BaseFreqs *>(&b);
+		BaseFreqs* thisDerivedPtr = dynamic_cast<BaseFreqs *>(this);
 		if ( thatDerivedPtr != 0 && thisDerivedPtr != 0 )
 			{
 			thisDerivedPtr->clone( *thatDerivedPtr );
@@ -70,8 +70,8 @@ Parm &Parm::operator=(Parm &b) {
 
 		/* check to see if the object is a tree parameter */
 		{
-		Tree *thatDerivedPtr = dynamic_cast<Tree *>(&b);
-		Tree *thisDerivedPtr = dynamic_cast<Tree *>(this);
+		Tree* thatDerivedPtr = dynamic_cast<Tree *>(&b);
+		Tree* thisDerivedPtr = dynamic_cast<Tree *>(this);
 		if ( thatDerivedPtr != 0 && thisDerivedPtr != 0 )
 			{
 			thisDerivedPtr->clone( *thatDerivedPtr );
@@ -81,8 +81,8 @@ Parm &Parm::operator=(Parm &b) {
 
 		/* check to see if the object is a tree parameter */
 		{
-		TreeLength *thatDerivedPtr = dynamic_cast<TreeLength *>(&b);
-		TreeLength *thisDerivedPtr = dynamic_cast<TreeLength *>(this);
+		TreeLength* thatDerivedPtr = dynamic_cast<TreeLength *>(&b);
+		TreeLength* thisDerivedPtr = dynamic_cast<TreeLength *>(this);
 		if ( thatDerivedPtr != 0 && thisDerivedPtr != 0 )
 			{
 			thisDerivedPtr->clone( *thatDerivedPtr );
@@ -97,5 +97,4 @@ Parm &Parm::operator=(Parm &b) {
 			;
 		}
 	return *this;
-
 }

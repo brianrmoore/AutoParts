@@ -117,9 +117,9 @@ Restaurant::Restaurant(MbRandom* rp, Settings* sp, Alignment* ap, Model* mp, Dua
 	// allocate the RGF
 	rgf = new int[numPatrons];
 	
-#if 0
+#   if 0
 	print();
-#endif
+#   endif
     
 }
 
@@ -341,7 +341,7 @@ Table* Restaurant::pickTableUniformlyAtRandom(void) {
 	int whichTable = (int)(ranPtr->uniformRv() * tables.size());
 	int i = 0;
     
-//    We cannot use sets of pointers because these will have different orders depending on the process
+    // We cannot use sets of pointers because these will have different orders depending on the process
 	
     for (std::vector<Table*>::iterator p = tables.begin(); p != tables.end(); p++)
 		{
@@ -367,19 +367,19 @@ void Restaurant::removeTable(Table* tbl) {
     
     int i = 0;
     for (std::vector<Table*>::iterator p=tables.begin(); p != tables.end(); p++)
-    {
-        if ( *p == tbl )
         {
+        if ( *p == tbl )
+            {
             break;
-        }
+            }
         ++i;
-    }
+        }
     
     if ( i < tables.size() )
-    {
+        {
         tables.erase(tables.begin()+i);
         delete tbl;
-    }
+        }
 }
 
 double Restaurant::sampleAlpha(int k, int n, double oldAlpha, double a, double b) {
@@ -656,7 +656,7 @@ void Restaurant::updateSeating(int patron) {
 		
 	// calculate the log probability (up to a constant) of seating the patron at each of the possible tables 
 	for (std::map<size_t,double>::iterator p = probs.begin(); p != probs.end(); p++)
-    {
+        {
 		Table* tbl = tables[p->first];                               // get a pointer to the table
 		tbl->seatPatron(patron);                             // seat the patron at the i-th existing table
 		double lnLPart = modelPtr->lnLikelihood(patron, false);   // calculate the likelihood when the patron is seated at the i-th table
@@ -667,7 +667,7 @@ void Restaurant::updateSeating(int patron) {
 		else 
 			p->second += log( tbl->numPatronsAtTable() - 1 );
 		tbl->removePatron( patron );
-    }
+        }
 
 	// calculate the probabilities of reseating the element at each of the tables, and pick a table to reseat the element at
 	normalizeLogProbabilitiesInMap(probs);
@@ -678,10 +678,10 @@ void Restaurant::updateSeating(int patron) {
     Table* newTable = NULL;
     size_t newTableIndex = 0;
 	for (std::map<size_t,double>::iterator p = probs.begin(); p != probs.end(); p++)
-    {
+        {
 		sum += p->second;
 		if (u < sum)
-        {
+            {
 			tables[p->first]->seatPatron(patron);
             newTable = tables[p->first];
             newTableIndex = p->first;

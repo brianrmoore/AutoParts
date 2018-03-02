@@ -62,41 +62,41 @@ typedef std::complex<double> mbcompl;
 class MbEigensystem {
 
 	public:
-                        MbEigensystem(const MbMatrix<double> &m);                                                                                //!< construct the eigenvalue decomposition
-                        ~MbEigensystem(void);                                                                                                    //!< destructor
-               double   getDeterminant (void);                                                                                                   //!< return determinant
-     MbMatrix<double>   &getEigenvectors(void) { return eigenvectors; }                                                                          //!< return the eigenvector matrix
-     MbMatrix<double>   &getInverseEigenvectors(void) { return inverseEigenvectors; }                                                            //!< return the inverse eigenvector matrix
-  std::vector<double>   &getRealEigenvalues(void) { return realEigenvalues; }                                                                    //!< return the real parts of the eigenvalues
-  std::vector<double>   &getImagEigenvalues(void) { return imaginaryEigenvalues; }                                                               //!< return the imaginary parts of the eigenvalues
-    MbMatrix<mbcompl>   &getComplexEigenvectors(void) { return complexEigenvectors; }                                                            //!< return the eigenvector matrix
-    MbMatrix<mbcompl>   &getComplexInverseEigenvectors() { return complexInverseEigenvectors; }                                                  //!< return the inverse eigenvector matrix
-                 bool   getIsComplex(void) { return isComplex; }                                                                                 //!< returns 'true' if there are complex eigenvalues
-                  int   update(const MbMatrix<double> &m);                                                                                       //!< update the eigensystem for matrix m
+                                MbEigensystem(const MbMatrix<double>& m);                                                                                //!< construct the eigenvalue decomposition
+                               ~MbEigensystem(void);                                                                                                    //!< destructor
+        double                  getDeterminant (void);                                                                                                   //!< return determinant
+        MbMatrix<double>&       getEigenvectors(void) { return eigenvectors; }                                                                          //!< return the eigenvector matrix
+        MbMatrix<double>&       getInverseEigenvectors(void) { return inverseEigenvectors; }                                                            //!< return the inverse eigenvector matrix
+        std::vector<double>&    getRealEigenvalues(void) { return realEigenvalues; }                                                                    //!< return the real parts of the eigenvalues
+        std::vector<double>&    getImagEigenvalues(void) { return imaginaryEigenvalues; }                                                               //!< return the imaginary parts of the eigenvalues
+        MbMatrix<mbcompl>&      getComplexEigenvectors(void) { return complexEigenvectors; }                                                            //!< return the eigenvector matrix
+        MbMatrix<mbcompl>&      getComplexInverseEigenvectors() { return complexInverseEigenvectors; }                                                  //!< return the inverse eigenvector matrix
+        bool                    getIsComplex(void) { return isComplex; }                                                                                 //!< returns 'true' if there are complex eigenvalues
+        int                     update(const MbMatrix<double>& m);                                                                                       //!< update the eigensystem for matrix m
 
-	private:
-                  int   n;                                                                                                                       //!< row and column dimension (square matrix)
-     MbMatrix<double>   eigenvectors;                                                                                                            //!< matrix for internal storage of eigenvectors
-     MbMatrix<double>   inverseEigenvectors;                                                                                                     //!< matrix for internal storage of the inverse eigenvectors
-    MbMatrix<mbcompl>   complexEigenvectors;                                                                                                     //!< matrix for internal storage of complex eigenvectors
-    MbMatrix<mbcompl>   complexInverseEigenvectors;                                                                                              //!< matrix for internal storage of the inverse of the complex eigenvectors
-  std::vector<double>   realEigenvalues;                                                                                                         //!< vector for internal storage of the eigenvalues (real part)
-  std::vector<double>   imaginaryEigenvalues;                                                                                                    //!< vector for internal storage of the eigenvalues (imaginary part)
-                 bool   isComplex;                                                                                                               //!< flag whether there are complex eigenvalues
-                 void   allocateComplexEigenvectors(void);                                                                                       //!< allocate space for complex eigenvectors
-	 			 void   balance(MbMatrix<double> &A, std::vector<double> &scale, int *low, int *high);                                           //!< balances a matrix
-                 void   balback(int low, int high, std::vector<double> &scale, MbMatrix<double> &eivec);                                         //!< reverses the balancing
-                 bool   checkForComplexEigenvalues(void);                                                                                        //!< returns 'true' if there are complex eigenvalues
-                 void   complexLUBackSubstitution(MbMatrix<mbcompl> &a, int *indx, std::vector<mbcompl> &b);                                     //!< back-substitutes a complex LU-decomposed matrix
-                  int   complexLUDecompose(MbMatrix<mbcompl> &a, double *vv, int *indx, double *pd);                                             //!< calculates the LU-decomposition of a complex matrix
-                 void   elmhes(int low, int high, MbMatrix<double> &a, std::vector<int> &perm);                                                  //!< reduces matrix to upper Hessenberg form
-                 void   elmtrans(int low, int high, MbMatrix<double> &a, std::vector<int> &perm, MbMatrix<double> &h);                           //!< copies the Hessenberg matrix
-                  int   hqr2(int low, int high, MbMatrix<double> &h, std::vector<double> &wr, std::vector<double> &wi, MbMatrix<double> &eivec); //!< computes eigenvalues and eigenvectors
-                 void   initializeComplexEigenvectors(void);                                                                                     //!< sets up the complex eigenvector matrix
-                  int   invertMatrix(MbMatrix<double> &a, MbMatrix<double> &aInv);                                                               //!< inverts a matrix
-                  int   invertComplexMatrix(MbMatrix<mbcompl> &a, MbMatrix<mbcompl> &aInv);                                                      //!< inverts a complex matrix
-                 void   luBackSubstitution (MbMatrix<double> &a, int *indx, double *b);                                                          //!< back-substitutes an LU-decomposed matrix
-                  int   luDecompose(MbMatrix<double> &a, double *vv, int *indx, double *pd);                                                     //!< calculates the LU-decomposition of a matrix
+    private:
+        int                     n;                                                                                                                       //!< row and column dimension (square matrix)
+        MbMatrix<double>        eigenvectors;                                                                                                            //!< matrix for internal storage of eigenvectors
+        MbMatrix<double>        inverseEigenvectors;                                                                                                     //!< matrix for internal storage of the inverse eigenvectors
+        MbMatrix<mbcompl>       complexEigenvectors;                                                                                                     //!< matrix for internal storage of complex eigenvectors
+        MbMatrix<mbcompl>       complexInverseEigenvectors;                                                                                              //!< matrix for internal storage of the inverse of the complex eigenvectors
+        std::vector<double>     realEigenvalues;                                                                                                         //!< vector for internal storage of the eigenvalues (real part)
+        std::vector<double>     imaginaryEigenvalues;                                                                                                    //!< vector for internal storage of the eigenvalues (imaginary part)
+        bool                    isComplex;                                                                                                               //!< flag whether there are complex eigenvalues
+        void                    allocateComplexEigenvectors(void);                                                                                       //!< allocate space for complex eigenvectors
+        void                    balance(MbMatrix<double>& A, std::vector<double>& scale, int* low, int* high);                                           //!< balances a matrix
+        void                    balback(int low, int high, std::vector<double>& scale, MbMatrix<double>& eivec);                                         //!< reverses the balancing
+        bool                    checkForComplexEigenvalues(void);                                                                                        //!< returns 'true' if there are complex eigenvalues
+        void                    complexLUBackSubstitution(MbMatrix<mbcompl>& a, int* indx, std::vector<mbcompl>& b);                                     //!< back-substitutes a complex LU-decomposed matrix
+        int                     complexLUDecompose(MbMatrix<mbcompl>& a, double* vv, int* indx, double* pd);                                             //!< calculates the LU-decomposition of a complex matrix
+        void                    elmhes(int low, int high, MbMatrix<double>& a, std::vector<int>& perm);                                                  //!< reduces matrix to upper Hessenberg form
+        void                    elmtrans(int low, int high, MbMatrix<double>& a, std::vector<int>& perm, MbMatrix<double>& h);                           //!< copies the Hessenberg matrix
+        int                     hqr2(int low, int high, MbMatrix<double>& h, std::vector<double>& wr, std::vector<double>& wi, MbMatrix<double>& eivec); //!< computes eigenvalues and eigenvectors
+        void                    initializeComplexEigenvectors(void);                                                                                     //!< sets up the complex eigenvector matrix
+        int                     invertMatrix(MbMatrix<double>& a, MbMatrix<double>& aInv);                                                               //!< inverts a matrix
+        int                     invertComplexMatrix(MbMatrix<mbcompl>& a, MbMatrix<mbcompl>& aInv);                                                      //!< inverts a complex matrix
+        void                    luBackSubstitution (MbMatrix<double>& a, int* indx, double* b);                                                          //!< back-substitutes an LU-decomposed matrix
+        int                     luDecompose(MbMatrix<double>& a, double* vv, int* indx, double* pd);                                                     //!< calculates the LU-decomposition of a matrix
 };
 
 #endif
